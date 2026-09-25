@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rated R Performance · Dyno Tuning &amp; Performance · San Antonio, TX</title>
+<meta name="description" content="Late model domestic performance in San Antonio. In-house dyno tuning, exhaust, cams, forced induction, engine upgrades, diagnostics and repair. Se habla español.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;900&family=Archivo:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#030405; --concrete:#1c1e22; --steel:#8b9199; --steel-lt:#c9cdd3;
+  --trace:#3f5bff; --glow:#7d95ff; --tail:#e3262f; --paper:#eef0f3;
+  --display:"Big Shoulders Display", Impact, "Arial Narrow", sans-serif;
+  --body:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --black:#030405; } }
+:root[data-theme="dark"]{ --black:#030405; }
+html{ scroll-padding-top:env(safe-area-inset-top,0px); scroll-behavior:smooth; }
+*,*::before,*::after{ box-sizing:inherit; }
+body{ margin:0; background:var(--black); color:var(--paper); font-family:var(--body); font-size:17px; line-height:1.55; -webkit-font-smoothing:antialiased; }
+a{ color:inherit; }
+:focus-visible{ outline:2px solid var(--glow); outline-offset:3px; }
+img{ max-width:100%; }
+
+/* ---------- top bar ---------- */
+.bar{ position:fixed; top:0; left:0; right:0; z-index:20; padding:calc(env(safe-area-inset-top,0px) + 14px) clamp(16px,4vw,40px) 14px; display:flex; align-items:center; justify-content:space-between; pointer-events:none; }
+.bar > *{ pointer-events:auto; }
+.mark{ font-family:var(--display); font-weight:900; font-size:26px; letter-spacing:.02em; text-decoration:none; line-height:1; }
+.mark span{ display:block; font-weight:500; font-size:11px; letter-spacing:.42em; color:var(--steel-lt); margin-top:3px; }
+.call{ font-family:var(--display); font-weight:700; font-size:18px; text-decoration:none; padding:9px 16px; border:1.5px solid var(--glow); border-radius:3px; background:rgba(3,4,5,.55); backdrop-filter:blur(6px); }
+.call:hover{ background:var(--trace); border-color:var(--trace); }
+
+/* ---------- hero / 3d ---------- */
+.hero{ position:relative; height:100vh; height:100svh; min-height:560px; overflow:hidden; }
+#stage{ position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:pan-y; cursor:grab; }
+#stage:active{ cursor:grabbing; }
+.hero-copy{ position:absolute; left:clamp(16px,4vw,40px); bottom:clamp(150px,22vh,210px); max-width:560px; pointer-events:none; opacity:0; transition:opacity 1.2s ease .2s; }
+.hero.inside .hero-copy{ opacity:1; }
+.hero-copy h1{ font-family:var(--display); font-weight:900; font-size:clamp(46px,8.5vw,104px); line-height:.88; margin:0 0 14px; letter-spacing:-.005em; text-shadow:0 4px 30px rgba(0,0,0,.8); }
+.hero-copy p{ margin:0; color:var(--steel-lt); max-width:40ch; text-shadow:0 2px 12px #000; }
+
+.hud{ position:absolute; left:0; right:0; bottom:0; padding:0 clamp(16px,4vw,40px) calc(22px + env(safe-area-inset-bottom,0px)); display:flex; align-items:flex-end; justify-content:space-between; gap:18px; opacity:0; transform:translateY(20px); transition:opacity .8s ease .6s, transform .8s ease .6s; }
+.hud{ pointer-events:none; }
+.hero.inside .hud{ opacity:1; transform:none; pointer-events:auto; }
+.tach{ width:150px; height:150px; flex:none; }
+.readout{ font-family:var(--display); line-height:1; }
+.readout b{ display:block; font-size:44px; font-weight:900; font-variant-numeric:tabular-nums; }
+.readout small{ font-size:14px; color:var(--steel); letter-spacing:.08em; }
+.controls{ display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+.rev{ -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; touch-action:none; font-family:var(--display); font-weight:900; font-size:28px; letter-spacing:.03em; color:#fff; background:var(--tail); border:0; border-radius:50%; width:112px; height:112px; box-shadow:0 0 0 6px rgba(227,38,47,.18), 0 10px 40px rgba(227,38,47,.35); cursor:pointer; line-height:1; transition:transform .08s; }
+.rev:active,.rev.on{ transform:scale(.94); box-shadow:0 0 0 10px rgba(227,38,47,.28), 0 0 60px rgba(227,38,47,.7); }
+.rev small{ display:block; font-size:12px; font-weight:500; letter-spacing:.12em; margin-top:4px; opacity:.85; }
+.mini{ background:none; border:1px solid rgba(255,255,255,.25); color:var(--steel-lt); font:500 13px var(--body); padding:6px 12px; border-radius:3px; cursor:pointer; }
+.mini:hover{ border-color:var(--glow); color:#fff; }
+.enter{ position:absolute; inset:0; display:grid; place-items:center; z-index:5; transition:opacity .6s; }
+.enter.gone{ opacity:0; pointer-events:none; }
+.enter button{ font-family:var(--display); font-weight:900; font-size:clamp(28px,5vw,40px); color:#fff; background:rgba(3,4,5,.6); border:2px solid var(--glow); padding:18px 34px; border-radius:3px; cursor:pointer; backdrop-filter:blur(4px); }
+.enter button:hover{ background:var(--trace); }
+.enter p{ margin:12px 0 0; text-align:center; color:var(--steel-lt); font-size:14px; }
+.hint{ position:absolute; top:calc(env(safe-area-inset-top,0px) + 78px); left:50%; transform:translateX(-50%); font-size:13px; color:var(--steel); opacity:0; transition:opacity 1s 1.4s; white-space:nowrap; }
+.hero.inside .hint{ opacity:.9; }
+
+/* ---------- sections ---------- */
+section{ padding:clamp(72px,11vw,140px) clamp(16px,4vw,40px); }
+.wrap{ max-width:1180px; margin:0 auto; }
+h2{ font-family:var(--display); font-weight:900; font-size:clamp(40px,6.4vw,78px); line-height:.9; margin:0 0 22px; }
+.lede{ color:var(--steel-lt); max-width:58ch; margin:0 0 48px; }
+
+/* dyno sheet */
+.sheet{ background:var(--paper); color:#11131a; border-radius:2px; position:relative; overflow:hidden; }
+.sheet::before{ content:""; position:absolute; inset:0; background-image:linear-gradient(rgba(63,91,255,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(63,91,255,.13) 1px,transparent 1px); background-size:44px 44px; pointer-events:none; }
+.sheet-head{ position:relative; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px 30px; padding:22px 26px; border-bottom:2px solid #11131a; font-size:14px; }
+.sheet-head strong{ font-family:var(--display); font-size:24px; font-weight:900; }
+.curve{ position:relative; display:block; width:100%; height:auto; }
+.runs{ position:relative; display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
+.run{ padding:26px; border-top:1px solid rgba(17,19,26,.18); border-right:1px solid rgba(17,19,26,.18); }
+.run h3{ font-family:var(--display); font-weight:900; font-size:30px; line-height:1; margin:0 0 10px; color:#0d1340; }
+.run p{ margin:0; font-size:15.5px; color:#2b2f3a; }
+
+/* process */
+.steps{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:0; border-top:1px solid rgba(255,255,255,.14); }
+.steps li{ padding:26px 22px 26px 0; border-bottom:1px solid rgba(255,255,255,.14); }
+.steps .n{ font-family:var(--display); font-size:64px; font-weight:900; line-height:1; color:var(--trace); }
+.steps h3{ font-family:var(--display); font-size:26px; margin:8px 0 6px; font-weight:700; }
+.steps p{ margin:0; color:var(--steel-lt); font-size:15.5px; max-width:30ch; }
+
+/* proof */
+.proof{ display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,1fr); gap:clamp(32px,6vw,90px); align-items:start; }
+.quote{ font-family:var(--display); font-weight:700; font-size:clamp(30px,4vw,48px); line-height:1.02; margin:0; }
+.facts{ display:grid; gap:0; }
+.fact{ display:flex; justify-content:space-between; align-items:baseline; gap:20px; padding:18px 0; border-bottom:1px solid rgba(255,255,255,.14); }
+.fact span{ color:var(--steel-lt); }
+.fact b{ font-family:var(--display); font-size:30px; font-weight:900; }
+.espanol{ margin-top:34px; padding:22px 24px; border-left:4px solid var(--tail); background:var(--concrete); }
+.espanol p{ margin:0; }
+.espanol p + p{ color:var(--steel-lt); font-size:15px; margin-top:6px; }
+
+/* ticket */
+.ticket{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); border:1.5px solid var(--steel); border-radius:2px; }
+.ticket > div{ padding:clamp(22px,4vw,44px); }
+.ticket > div + div{ border-left:1.5px dashed var(--steel); }
+.row{ padding:14px 0; border-bottom:1px solid rgba(255,255,255,.12); }
+.row small{ display:block; color:var(--steel); font-size:13px; }
+.row a,.row span{ font-family:var(--display); font-weight:700; font-size:clamp(22px,2.6vw,30px); text-decoration:none; overflow-wrap:anywhere; }
+.row a:hover{ color:var(--glow); }
+.btns{ display:flex; flex-wrap:wrap; gap:12px; margin-top:26px; }
+.btn{ font-family:var(--display); font-weight:700; font-size:20px; text-decoration:none; padding:13px 22px; border-radius:3px; background:var(--trace); color:#fff; border:1.5px solid var(--trace); }
+.btn.ghost{ background:none; border-color:var(--steel); }
+.btn:hover{ filter:brightness(1.15); }
+form{ display:grid; gap:14px; }
+label{ font-size:14px; color:var(--steel-lt); display:grid; gap:6px; }
+input,select,textarea{ font:inherit; color:var(--paper); background:var(--concrete); border:1px solid rgba(255,255,255,.18); border-radius:2px; padding:12px 13px; width:100%; }
+textarea{ min-height:96px; resize:vertical; }
+form .btn{ cursor:pointer; justify-self:start; }
+.formnote{ font-size:13px; color:var(--steel); margin:0; }
+
+footer{ padding:34px clamp(16px,4vw,40px) calc(34px + env(safe-area-inset-bottom,0px)); border-top:1px solid rgba(255,255,255,.1); color:var(--steel); font-size:14px; }
+footer .wrap{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; }
+
+@media (max-width:760px){
+  .proof,.ticket{ grid-template-columns:1fr; }
+  .ticket > div + div{ border-left:0; border-top:1.5px dashed var(--steel); }
+  .tach{ width:112px; height:112px; }
+  .readout b{ font-size:34px; }
+  .rev{ width:96px; height:96px; font-size:24px; }
+  .hero-copy{ bottom:170px; }
+  .hero-copy p{ font-size:15px; }
+  .call{ font-size:16px; padding:8px 12px; }
+}
+@media (prefers-reduced-motion:reduce){ html{ scroll-behavior:auto; } }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <a class="mark" href="#top" aria-label="Rated R Performance home">RATED R<span>PERFORMANCE</span></a>
+  <a class="call" href="tel:+12104043594">(210) 404-3594</a>
+</header>
+
+<main>
+<div class="hero" id="top">
+  <canvas id="stage" aria-label="3D view of the Rated R Performance shop with a car on the dyno"></canvas>
+
+  <div class="enter" id="enter">
+    <div>
+      <button id="enterBtn" type="button">Walk into the shop</button>
+      <p>Sound on for the full experience</p>
+    </div>
+  </div>
+
+  <p class="hint">Drag to look around</p>
+
+  <div class="hero-copy">
+    <h1>Built, tuned and proven on the dyno.</h1>
+    <p>Late model domestic performance in San Antonio. Cams, exhaust, forced induction and custom tunes, with every pull on the rollers.</p>
+  </div>
+
+  <div class="hud">
+    <div style="display:flex;align-items:flex-end;gap:14px">
+      <svg class="tach" viewBox="0 0 200 200" aria-hidden="true">
+        <circle cx="100" cy="100" r="92" fill="rgba(3,4,5,.72)" stroke="rgba(255,255,255,.18)" stroke-width="2"/>
+        <g id="ticks"></g>
+        <path id="redline" fill="none" stroke="#e3262f" stroke-width="7"/>
+        <line id="needle" x1="100" y1="100" x2="100" y2="26" stroke="#e3262f" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="100" cy="100" r="9" fill="#e3262f"/>
+        <text x="100" y="150" text-anchor="middle" fill="#8b9199" font-family="Big Shoulders Display, sans-serif" font-size="14">RPM ×1000</text>
+      </svg>
+      <div class="readout" aria-live="off">
+        <b id="rpmOut">0</b><small>RPM</small>
+        <b id="hpOut" style="margin-top:8px;color:var(--glow)">0</b><small>WHEEL HP</small>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="rev" id="rev" type="button" aria-label="Hold to rev the engine">REV<small>HOLD</small></button>
+      <button class="mini" id="mute" type="button" aria-pressed="false">Sound on</button>
+    </div>
+  </div>
+</div>
+
+<section id="services">
+  <div class="wrap">
+    <h2>What we build</h2>
+    <p class="lede">Camaros, Corvettes, Mustangs, Chargers, trucks. If it's late model and domestic, we can make it faster, then prove it with a before and after pull.</p>
+
+    <div class="sheet">
+      <div class="sheet-head">
+        <strong>Service sheet</strong>
+        <span>Rated R Performance · 7350 Eckhert Rd, San Antonio</span>
+      </div>
+      <svg class="curve" viewBox="0 0 1000 220" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0,200 C120,190 220,150 330,120 S560,52 700,40 S880,34 1000,70" fill="none" stroke="#3f5bff" stroke-width="3"/>
+        <path d="M0,205 C150,196 260,168 380,146 S600,110 740,112 S900,134 1000,160" fill="none" stroke="#e3262f" stroke-width="2.5" stroke-dasharray="7 6"/>
+      </svg>
+      <div class="runs">
+        <div class="run"><h3>Dyno tuning</h3><p>Custom calibrations built on our in-house chassis dyno. Fueling, timing and drivability dialed in with real data, not a canned file.</p></div>
+        <div class="run"><h3>Exhaust</h3><p>Cat-back, headers and full systems, from street-friendly to loud. Installed, then tuned to match.</p></div>
+        <div class="run"><h3>Cam swaps</h3><p>Choose the idle you want and the power band you need. Cam, springs and pushrods installed and tuned as one package.</p></div>
+        <div class="run"><h3>Forced induction</h3><p>Superchargers and turbo kits, pulley upgrades and supporting fuel system work for boosted builds.</p></div>
+        <div class="run"><h3>Engine upgrades</h3><p>Heads, intakes, injectors and bolt-on packages for naturally aspirated power that still starts every morning.</p></div>
+        <div class="run"><h3>Diagnostics &amp; repair</h3><p>Check engine lights, drivability problems and everyday repair. The same care we give race cars goes into your daily driver.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <h2>How a build goes</h2>
+    <p class="lede">Every performance job follows the same path, so you know what you're paying for and what you got.</p>
+    <ol class="steps">
+      <li><div class="n">1</div><h3>Talk it through</h3><p>Your goals, your budget and how you actually drive the car.</p></li>
+      <li><div class="n">2</div><h3>Baseline pull</h3><p>We put it on the dyno first so there's a real starting number.</p></li>
+      <li><div class="n">3</div><h3>Build</h3><p>Parts installed by the same people who will tune it.</p></li>
+      <li><div class="n">4</div><h3>Tune</h3><p>Pull after pull until it's making power safely.</p></li>
+      <li><div class="n">5</div><h3>Final sheet</h3><p>You leave with the before and after graph in hand.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section style="background:var(--concrete)">
+  <div class="wrap proof">
+    <div>
+      <p class="quote">98% of customers recommend us across 35 Facebook reviews.</p>
+    </div>
+    <div>
+      <div class="facts">
+        <div class="fact"><span>Specialty</span><b>Late model domestic</b></div>
+        <div class="fact"><span>Tuning</span><b>In-house dyno</b></div>
+        <div class="fact"><span>Builds</span><b>NA &amp; boosted</b></div>
+      </div>
+      <div class="espanol">
+        <p><strong>Se habla español.</strong></p>
+        <p>Llámenos para una cotización o para agendar su carro en el dyno.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <h2>Book dyno time</h2>
+    <p class="lede">Call or text for the fastest answer. Tell us the year, make and model and what you want it to do.</p>
+    <div class="ticket">
+      <div>
+        <div class="row"><small>Phone</small><a href="tel:+12104043594">(210) 404-3594</a></div>
+        <div class="row"><small>Email</small><a href="mailto:ratedrperformancetx@gmail.com">ratedrperformancetx@gmail.com</a></div>
+        <div class="row"><small>Shop</small><span>7350 Eckhert Rd<br>San Antonio, TX 78238</span></div>
+        <div class="btns">
+          <a class="btn" href="https://www.google.com/maps/search/?api=1&query=Rated+R+Performance+7350+Eckhert+Rd+San+Antonio+TX+78238" target="_blank" rel="noopener">Get directions</a>
+          <a class="btn ghost" href="https://www.instagram.com/rated_r_performance/" target="_blank" rel="noopener">Instagram</a>
+          <a class="btn ghost" href="https://www.facebook.com/ratedrperformance" target="_blank" rel="noopener">Facebook</a>
+        </div>
+      </div>
+      <div>
+        <form id="quote">
+          <label>Your name<input name="name" required autocomplete="name"></label>
+          <label>Phone<input name="phone" type="tel" required autocomplete="tel"></label>
+          <label>Vehicle<input name="car" placeholder="2019 Camaro SS" required></label>
+          <label>What are you after?
+            <select name="service">
+              <option>Dyno tune</option><option>Exhaust</option><option>Cam swap</option>
+              <option>Supercharger / turbo</option><option>Engine upgrades</option><option>Diagnostics / repair</option>
+            </select>
+          </label>
+          <label>Details<textarea name="notes" placeholder="Current mods, goals, timeline"></textarea></label>
+          <button class="btn" type="submit">Send quote request</button>
+          <p class="formnote">Opens your email app with the request filled in.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="yr"></span> Rated R Performance · San Antonio, Texas</span>
+    <span>Late model domestic performance, dyno tuning and auto repair</span>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+/* ---------- quote form -> mailto ---------- */
+document.getElementById('quote').addEventListener('submit', function(e){
+  e.preventDefault();
+  var f = new FormData(this);
+  var body = 'Name: '+f.get('name')+'\nPhone: '+f.get('phone')+'\nVehicle: '+f.get('car')+'\nService: '+f.get('service')+'\n\n'+(f.get('notes')||'');
+  location.href = 'mailto:ratedrperformancetx@gmail.com?subject='+encodeURIComponent('Quote request: '+f.get('car'))+'&body='+encodeURIComponent(body);
+});
+
+/* ---------- tach ---------- */
+var MAXRPM = 8000, REDLINE = 6800;
+var ticks = document.getElementById('ticks');
+function ang(r){ return -225 + (r/MAXRPM)*270; }
+function polar(a,rad){ var t=a*Math.PI/180; return [100+rad*Math.cos(t), 100+rad*Math.sin(t)]; }
+for(var i=0;i<=8;i++){
+  var a = ang(i*1000);
+  var p1=polar(a,82), p2=polar(a,70), pl=polar(a,56);
+  ticks.innerHTML += '<line x1="'+p1[0]+'" y1="'+p1[1]+'" x2="'+p2[0]+'" y2="'+p2[1]+'" stroke="#c9cdd3" stroke-width="3"/>'+
+    '<text x="'+pl[0]+'" y="'+(pl[1]+6)+'" text-anchor="middle" fill="#eef0f3" font-family="Big Shoulders Display, sans-serif" font-weight="700" font-size="17">'+i+'</text>';
+}
+(function(){ var s=polar(ang(REDLINE),84), e=polar(ang(MAXRPM),84);
+  document.getElementById('redline').setAttribute('d','M'+s[0]+','+s[1]+' A84,84 0 0,1 '+e[0]+','+e[1]); })();
+var needle = document.getElementById('needle'), rpmOut=document.getElementById('rpmOut'), hpOut=document.getElementById('hpOut');
+
+/* ---------- three.js scene ---------- */
+var hero = document.querySelector('.hero');
+var canvas = document.getElementById('stage');
+var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(!window.THREE){ hero.classList.add('inside'); document.getElementById('enter').classList.add('gone'); return; }
+
+var renderer = new THREE.WebGLRenderer({canvas:canvas, antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+
+var scene = new THREE.Scene();
+scene.background = new THREE.Color(0x030405);
+scene.fog = new THREE.Fog(0x030405, 18, 48);
+var camera = new THREE.PerspectiveCamera(50, 1, 0.1, 120);
+
+function canvasTex(w,h,draw){ var c=document.createElement('canvas'); c.width=w; c.height=h; draw(c.getContext('2d'),w,h); var t=new THREE.CanvasTexture(c); t.encoding=THREE.sRGBEncoding; t.anisotropy=4; return t; }
+
+/* corrugated metal */
+var corrTex = canvasTex(256,256,function(g,w,h){
+  for(var x=0;x<w;x++){ var v=Math.sin(x/w*Math.PI*16); var c=Math.round(118+v*34); g.fillStyle='rgb('+c+','+(c+4)+','+(c+10)+')'; g.fillRect(x,0,1,h); }
+  g.globalAlpha=.07; for(var i=0;i<400;i++){ g.fillStyle=Math.random()>.5?'#000':'#fff'; g.fillRect(Math.random()*w,Math.random()*h,2,Math.random()*18); }
+});
+corrTex.wrapS = corrTex.wrapT = THREE.RepeatWrapping;
+function wallMat(rx,ry){ var t=corrTex.clone(); t.needsUpdate=true; t.repeat.set(rx,ry); return new THREE.MeshStandardMaterial({map:t, metalness:.55, roughness:.5}); }
+
+/* concrete floor */
+var floorTex = canvasTex(512,512,function(g,w,h){
+  g.fillStyle='#3a3c40'; g.fillRect(0,0,w,h);
+  for(var i=0;i<9000;i++){ var c=50+Math.random()*40|0; g.fillStyle='rgba('+c+','+c+','+(c+3)+','+(Math.random()*.35)+')'; g.fillRect(Math.random()*w,Math.random()*h,2,2); }
+  g.strokeStyle='rgba(0,0,0,.45)'; g.lineWidth=2; g.strokeRect(0,0,w,h);
+  g.fillStyle='rgba(0,0,0,.18)'; for(var k=0;k<6;k++){ g.beginPath(); g.ellipse(Math.random()*w,Math.random()*h,30+Math.random()*60,14+Math.random()*30,Math.random()*3,0,7); g.fill(); }
+});
+floorTex.wrapS=floorTex.wrapT=THREE.RepeatWrapping; floorTex.repeat.set(6,6);
+
+var ROOM = {w:22, d:26, h:7.5};
+var floor = new THREE.Mesh(new THREE.PlaneGeometry(ROOM.w, ROOM.d), new THREE.MeshStandardMaterial({map:floorTex, roughness:.38, metalness:.15}));
+floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; scene.add(floor);
+
+var backWall = new THREE.Mesh(new THREE.PlaneGeometry(ROOM.w, ROOM.h), wallMat(5,1));
+backWall.position.set(0, ROOM.h/2, -ROOM.d/2); scene.add(backWall);
+var lWall = new THREE.Mesh(new THREE.PlaneGeometry(ROOM.d, ROOM.h), wallMat(6,1));
+lWall.rotation.y = Math.PI/2; lWall.position.set(-ROOM.w/2, ROOM.h/2, 0); scene.add(lWall);
+var rWall = lWall.clone(); rWall.rotation.y = -Math.PI/2; rWall.position.x = ROOM.w/2; scene.add(rWall);
+var ceil = new THREE.Mesh(new THREE.PlaneGeometry(ROOM.w, ROOM.d), new THREE.MeshStandardMaterial({color:0x1a1c20, roughness:.9}));
+ceil.rotation.x = Math.PI/2; ceil.position.y = ROOM.h; scene.add(ceil);
+
+/* front wall with roll-up door opening */
+var frontZ = ROOM.d/2;
+var doorW = 8, doorH = 5.6;
+var fwMat = wallMat(2,1); fwMat.side = THREE.DoubleSide;
+var fl = new THREE.Mesh(new THREE.PlaneGeometry((ROOM.w-doorW)/2, ROOM.h), fwMat);
+fl.rotation.y = Math.PI; fl.position.set(-(doorW/2 + (ROOM.w-doorW)/4), ROOM.h/2, frontZ); scene.add(fl);
+var fr = fl.clone(); fr.position.x *= -1; scene.add(fr);
+var ft = new THREE.Mesh(new THREE.PlaneGeometry(doorW, ROOM.h-doorH), fwMat);
+ft.rotation.y = Math.PI; ft.position.set(0, doorH + (ROOM.h-doorH)/2, frontZ); scene.add(ft);
+// roll-up door
+var doorTex = canvasTex(64,256,function(g,w,h){ for(var y=0;y<h;y++){ var v=(y%16)<2?60:150+Math.sin(y/16*Math.PI)*20; g.fillStyle='rgb('+v+','+v+','+(v+6)+')'; g.fillRect(0,y,w,1);} });
+doorTex.wrapT = THREE.RepeatWrapping; doorTex.repeat.set(1,3);
+var door = new THREE.Mesh(new THREE.PlaneGeometry(doorW, doorH), new THREE.MeshStandardMaterial({map:doorTex, metalness:.5, roughness:.45, side:THREE.DoubleSide}));
+door.position.set(0, doorH/2, frontZ-0.03); scene.add(door);
+// outside ground + night
+var outside = new THREE.Mesh(new THREE.PlaneGeometry(60,30), new THREE.MeshStandardMaterial({color:0x121316, roughness:.95}));
+outside.rotation.x=-Math.PI/2; outside.position.set(0,-0.01,frontZ+15); scene.add(outside);
+
+/* exterior sign above door */
+var signTex = canvasTex(1024,256,function(g,w,h){
+  g.fillStyle='#000'; g.fillRect(0,0,w,h);
+  g.fillStyle='#e8eaee'; g.font='900 150px "Big Shoulders Display", Impact, sans-serif'; g.textAlign='center'; g.textBaseline='middle';
+  g.fillText('RATED R', w/2, h*0.44);
+  g.font='500 44px "Archivo", Arial, sans-serif'; g.fillStyle='#9aa3b5';
+  g.fillText('P E R F O R M A N C E', w/2, h*0.84);
+});
+var outSign = new THREE.Mesh(new THREE.PlaneGeometry(5,1.25), new THREE.MeshBasicMaterial({map:signTex}));
+outSign.rotation.y = Math.PI; outSign.position.set(0, doorH+0.95, frontZ+0.05);
+outSign.rotation.y = 0; outSign.position.z = frontZ+0.06;
+scene.add(outSign);
+var outLight = new THREE.SpotLight(0xdde4ff, 2.2, 14, .7, .6);
+outLight.position.set(0, doorH+3, frontZ+3); outLight.target = outSign; scene.add(outLight);
+
+/* backlit interior sign */
+var inSign = new THREE.Mesh(new THREE.PlaneGeometry(6.4,1.6), new THREE.MeshBasicMaterial({map:signTex}));
+inSign.position.set(0, 4.9, -ROOM.d/2+0.12); scene.add(inSign);
+var halo = new THREE.Mesh(new THREE.PlaneGeometry(7.6,2.6), new THREE.MeshBasicMaterial({color:0x3f5bff, transparent:true, opacity:.55}));
+halo.position.set(0,4.9,-ROOM.d/2+0.06); scene.add(halo);
+var signGlow = new THREE.PointLight(0x4a66ff, 3.2, 12, 2); signGlow.position.set(0,4.9,-ROOM.d/2+1); scene.add(signGlow);
+
+/* lighting */
+scene.add(new THREE.HemisphereLight(0x9fb0ff, 0x1a1a1a, .35));
+var tubeMat = new THREE.MeshBasicMaterial({color:0xffffff});
+[-4.5,0,4.5].forEach(function(x){
+  [-6,0,6].forEach(function(z){
+    var tube = new THREE.Mesh(new THREE.BoxGeometry(.18,.08,3.2), tubeMat); tube.position.set(x,ROOM.h-.3,z); scene.add(tube);
+  });
+});
+var key = new THREE.SpotLight(0xffffff, 2.4, 30, .75, .5, 1.2);
+key.position.set(0, ROOM.h-.4, 1); key.target.position.set(0,0,-3);
+key.castShadow = true; key.shadow.mapSize.set(1024,1024); key.shadow.bias=-0.0005;
+scene.add(key); scene.add(key.target);
+var fill1 = new THREE.PointLight(0xffffff,.9,22,2); fill1.position.set(-5,ROOM.h-.5,4); scene.add(fill1);
+var fill2 = new THREE.PointLight(0xffffff,.9,22,2); fill2.position.set(5,ROOM.h-.5,-6); scene.add(fill2);
+
+/* ---------- dyno ---------- */
+var CAR_Z = -3.2;
+var dyno = new THREE.Group(); scene.add(dyno);
+var steel = new THREE.MeshStandardMaterial({color:0x2a2d33, metalness:.8, roughness:.35});
+var tread = canvasTex(128,128,function(g,w,h){ g.fillStyle='#34373d'; g.fillRect(0,0,w,h); g.fillStyle='#50545c'; for(var y=0;y<h;y+=16)for(var x=(y/16%2)*8;x<w;x+=16){ g.save(); g.translate(x,y); g.rotate(.7); g.fillRect(-5,-1.5,10,3); g.restore(); } });
+tread.wrapS=tread.wrapT=THREE.RepeatWrapping; tread.repeat.set(4,8);
+var deck = new THREE.Mesh(new THREE.BoxGeometry(3.4,.12,7.2), new THREE.MeshStandardMaterial({map:tread, metalness:.7, roughness:.45}));
+deck.position.set(0,.06,CAR_Z); deck.receiveShadow=true; dyno.add(deck);
+var ramp = new THREE.Mesh(new THREE.BoxGeometry(3.4,.06,1.2), steel); ramp.position.set(0,.03,CAR_Z+4.1); ramp.rotation.x=.08; dyno.add(ramp);
+var rollerMat = new THREE.MeshStandardMaterial({color:0x9da3ab, metalness:.9, roughness:.25});
+var rollers = [];
+var REAR_Z = CAR_Z + 1.35; // car rear axle (car faces -z? we set car front toward camera)
+function addRoller(z){ var r=new THREE.Mesh(new THREE.CylinderGeometry(.28,.28,3.1,24), rollerMat); r.rotation.z=Math.PI/2; r.position.set(0,.13,z); dyno.add(r); rollers.push(r);
+  var stripe=new THREE.Mesh(new THREE.BoxGeometry(3.12,.04,.06), new THREE.MeshStandardMaterial({color:0xe3262f})); r.add(stripe); stripe.position.y=.27; }
+// straps
+var strapMat = new THREE.MeshStandardMaterial({color:0xc2161f, roughness:.8});
+
+/* ---------- the car (generic modern muscle coupe) ---------- */
+var car = new THREE.Group();
+var body = new THREE.Group(); car.add(body);
+var paint = new THREE.MeshPhysicalMaterial({color:0x17191e, metalness:.6, roughness:.28, clearcoat:1, clearcoatRoughness:.08});
+var trim = new THREE.MeshStandardMaterial({color:0x050505, roughness:.6, metalness:.3});
+var glass = new THREE.MeshPhysicalMaterial({color:0x0a0f18, metalness:.2, roughness:.05, transparent:true, opacity:.82, clearcoat:1});
+
+// body shell from an extruded side profile (length along x, then rotate)
+var prof = new THREE.Shape();
+prof.moveTo(-2.35,.32); prof.lineTo(2.25,.32); prof.quadraticCurveTo(2.45,.34,2.42,.62);
+prof.lineTo(2.3,.86); prof.quadraticCurveTo(1.4,1.0,.55,1.02); prof.lineTo(-1.6,1.02);
+prof.quadraticCurveTo(-2.3,1.02,-2.38,.8); prof.lineTo(-2.4,.45); prof.lineTo(-2.35,.32);
+var shellGeo = new THREE.ExtrudeGeometry(prof,{depth:1.86, bevelEnabled:true, bevelThickness:.08, bevelSize:.07, bevelSegments:4, curveSegments:18});
+shellGeo.translate(0,0,-.93);
+var shell = new THREE.Mesh(shellGeo, paint); shell.castShadow=true; body.add(shell);
+// cabin
+var cab = new THREE.Shape();
+cab.moveTo(.55,1.02); cab.quadraticCurveTo(.1,1.44,-.35,1.46); cab.lineTo(-.9,1.44); cab.quadraticCurveTo(-1.45,1.3,-1.75,1.02); cab.lineTo(.55,1.02);
+var cabGeo = new THREE.ExtrudeGeometry(cab,{depth:1.5, bevelEnabled:true, bevelThickness:.05, bevelSize:.05, bevelSegments:3, curveSegments:14});
+cabGeo.translate(0,0,-.75);
+var cabin = new THREE.Mesh(cabGeo, glass); body.add(cabin);
+var roof = new THREE.Mesh(new THREE.BoxGeometry(.72,.05,1.42), paint); roof.position.set(-.62,1.47,0); body.add(roof);
+// hood bulge + vents
+var bulge = new THREE.Mesh(new THREE.BoxGeometry(1.2,.07,.8), paint); bulge.position.set(1.35,.99,0); bulge.rotation.z=-.07; body.add(bulge);
+var vent = new THREE.Mesh(new THREE.BoxGeometry(.35,.02,.5), trim); vent.position.set(1.55,1.02,0); vent.rotation.z=-.07; body.add(vent);
+// spoiler
+var spoiler = new THREE.Mesh(new THREE.BoxGeometry(.28,.05,1.8), paint); spoiler.position.set(-2.3,1.08,0); body.add(spoiler);
+// grille + lights (front = +x)
+var grille = new THREE.Mesh(new THREE.BoxGeometry(.06,.26,1.3), trim); grille.position.set(2.47,.52,0); body.add(grille);
+var headMat = new THREE.MeshStandardMaterial({color:0xffffff, emissive:0xdfe8ff, emissiveIntensity:2});
+[-.72,.72].forEach(function(z){ var hl=new THREE.Mesh(new THREE.BoxGeometry(.08,.07,.36), headMat); hl.position.set(2.36,.8,z); hl.rotation.z=-.35; body.add(hl); });
+var tailMat = new THREE.MeshStandardMaterial({color:0x3a0000, emissive:0xe3262f, emissiveIntensity:1.6});
+[-.7,.7].forEach(function(z){ var tl=new THREE.Mesh(new THREE.BoxGeometry(.06,.1,.46), tailMat); tl.position.set(-2.46,.78,z); body.add(tl); });
+// splitter/diffuser
+var split = new THREE.Mesh(new THREE.BoxGeometry(.3,.03,1.9), trim); split.position.set(2.4,.3,0); body.add(split);
+var diff = new THREE.Mesh(new THREE.BoxGeometry(.25,.1,1.4), trim); diff.position.set(-2.42,.36,0); body.add(diff);
+// quad exhaust tips
+var tipMat = new THREE.MeshStandardMaterial({color:0x2e3440, metalness:1, roughness:.2, emissive:0x000000});
+var tips=[];
+[-.56,-.36,.36,.56].forEach(function(z){ var t=new THREE.Mesh(new THREE.CylinderGeometry(.065,.065,.2,16,1,true), tipMat); t.rotation.z=Math.PI/2; t.position.set(-2.5,.36,z); body.add(t); tips.push(t); });
+// wheels
+var tireMat = new THREE.MeshStandardMaterial({color:0x111111, roughness:.9});
+var rimMat = new THREE.MeshStandardMaterial({color:0x1d1f24, metalness:.9, roughness:.25});
+var caliper = new THREE.MeshStandardMaterial({color:0xe3262f, roughness:.4});
+var wheels=[];
+function wheel(x,z){
+  var g=new THREE.Group();
+  var tire=new THREE.Mesh(new THREE.CylinderGeometry(.36,.36,.3,28), tireMat); tire.rotation.x=Math.PI/2; tire.castShadow=true; g.add(tire);
+  var spin=new THREE.Group(); g.add(spin);
+  var face=new THREE.Mesh(new THREE.CylinderGeometry(.26,.26,.02,24), rimMat); face.rotation.x=Math.PI/2; face.position.z=.15*Math.sign(z); spin.add(face);
+  for(var i=0;i<5;i++){ var sp=new THREE.Mesh(new THREE.BoxGeometry(.05,.44,.03), new THREE.MeshStandardMaterial({color:0x8a9099, metalness:1, roughness:.2})); sp.rotation.z=i/5*Math.PI*2; sp.position.z=.165*Math.sign(z); spin.add(sp); }
+  var cal=new THREE.Mesh(new THREE.BoxGeometry(.14,.18,.06), caliper); cal.position.set(.13,.1,.11*Math.sign(z)); g.add(cal);
+  g.position.set(x,.36,z); car.add(g); wheels.push({g:g, spin:spin, rear:x<0});
+}
+wheel(1.55,.9); wheel(1.55,-.9); wheel(-1.5,.9); wheel(-1.5,-.9);
+// car orientation: front toward the camera (+z), rear on the rollers
+car.rotation.y = -Math.PI/2; // local +x (front) -> world +z
+car.position.set(0,0,CAR_Z);
+scene.add(car);
+// rollers under rear wheels (world z = CAR_Z - 1.5)
+addRoller(CAR_Z-1.5-.28); addRoller(CAR_Z-1.5+.28);
+// tie-down straps (front)
+[-.95,.95].forEach(function(x){ var s=new THREE.Mesh(new THREE.BoxGeometry(.05,.03,1.4), strapMat); s.position.set(x,.35,CAR_Z+2.3); s.rotation.x=.42; scene.add(s); });
+
+/* dyno fan in front of car */
+var fan = new THREE.Group(); scene.add(fan);
+var fanRing = new THREE.Mesh(new THREE.TorusGeometry(.75,.08,10,40), new THREE.MeshStandardMaterial({color:0x202226, metalness:.6, roughness:.4}));
+fan.add(fanRing);
+var blades = new THREE.Group(); fan.add(blades);
+for(var b=0;b<5;b++){ var bl=new THREE.Mesh(new THREE.BoxGeometry(.18,.66,.02), new THREE.MeshStandardMaterial({color:0x44484f, metalness:.7})); bl.position.y=.34; var pv=new THREE.Group(); pv.rotation.z=b/5*Math.PI*2; bl.rotation.y=.4; pv.add(bl); blades.add(pv); }
+var fanLeg = new THREE.Mesh(new THREE.BoxGeometry(.1,1,.1), steel); fanLeg.position.y=-1.1; fan.add(fanLeg);
+fan.position.set(1.9,1.1,CAR_Z+3.9); fan.rotation.y=-.5;
+
+/* dyno monitor with live graph */
+var monC = document.createElement('canvas'); monC.width=512; monC.height=320;
+var monG = monC.getContext('2d');
+var monTex = new THREE.CanvasTexture(monC); monTex.encoding=THREE.sRGBEncoding;
+var monitor = new THREE.Group(); scene.add(monitor);
+var screen = new THREE.Mesh(new THREE.PlaneGeometry(1.6,1), new THREE.MeshBasicMaterial({map:monTex}));
+var bezel = new THREE.Mesh(new THREE.BoxGeometry(1.72,1.1,.06), trim); bezel.position.z=-.04;
+monitor.add(bezel); monitor.add(screen);
+var stand = new THREE.Mesh(new THREE.BoxGeometry(.08,1.5,.08), steel); stand.position.y=-1.3; monitor.add(stand);
+var cartB = new THREE.Mesh(new THREE.BoxGeometry(.9,.8,.6), new THREE.MeshStandardMaterial({color:0x121417, metalness:.5, roughness:.5})); cartB.position.set(0,-2.05,0); cartB.castShadow=true; monitor.add(cartB);
+monitor.position.set(-3.1,2.45,CAR_Z+.8); monitor.rotation.y=.62;
+
+/* tool chests */
+function chest(x,z,ry,color){
+  var g=new THREE.Group();
+  var m=new THREE.MeshStandardMaterial({color:color, metalness:.55, roughness:.35});
+  var bx=new THREE.Mesh(new THREE.BoxGeometry(2.2,1.2,.75), m); bx.position.y=.7; bx.castShadow=true; g.add(bx);
+  var top=new THREE.Mesh(new THREE.BoxGeometry(2.1,.7,.65), m); top.position.y=1.65; g.add(top);
+  for(var i=0;i<6;i++){ var h=new THREE.Mesh(new THREE.BoxGeometry(1.9,.02,.02), new THREE.MeshStandardMaterial({color:0xaaaaaa, metalness:1})); h.position.set(0,.3+i*.2+(i>3?.3:0),.39); g.add(h); }
+  g.position.set(x,0,z); g.rotation.y=ry; scene.add(g);
+}
+chest(-ROOM.w/2+.6,-7.5,Math.PI/2,0xb3141c);
+chest(ROOM.w/2-.6,-4,-Math.PI/2,0x14161a);
+// two-post lift on the right
+[-1.8,1.8].forEach(function(dz){ var post=new THREE.Mesh(new THREE.BoxGeometry(.3,4.4,.3), new THREE.MeshStandardMaterial({color:0x1b2a6b, metalness:.5, roughness:.5})); post.position.set(7,2.2,4+dz); post.castShadow=true; scene.add(post); });
+// parts boxes
+[[ -7.5,0,3],[ -7.1,0,4.1],[-7.6,.62,3.4]].forEach(function(p){ var bx=new THREE.Mesh(new THREE.BoxGeometry(.9,.6,.7), new THREE.MeshStandardMaterial({color:0x7a5b3a, roughness:.9})); bx.position.set(p[0],p[1]+.3,p[2]); bx.rotation.y=Math.random(); scene.add(bx); });
+
+/* ---------- exhaust flames ---------- */
+var flameTex = canvasTex(64,64,function(g,w,h){ var gr=g.createRadialGradient(32,32,0,32,32,32); gr.addColorStop(0,'rgba(255,255,255,1)'); gr.addColorStop(.25,'rgba(160,190,255,.95)'); gr.addColorStop(.5,'rgba(255,140,40,.7)'); gr.addColorStop(1,'rgba(255,60,0,0)'); g.fillStyle=gr; g.fillRect(0,0,w,h); });
+var flames=[];
+var flameGroup = new THREE.Group(); scene.add(flameGroup);
+for(var fi=0;fi<60;fi++){ var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:flameTex, blending:THREE.AdditiveBlending, transparent:true, depthWrite:false, opacity:0})); sp.visible=false; flameGroup.add(sp); flames.push({s:sp, life:0, v:new THREE.Vector3()}); }
+var flameLight = new THREE.PointLight(0xff7a2a, 0, 6, 2); scene.add(flameLight);
+var tipWorld = tips.map(function(){ return new THREE.Vector3(); });
+function burst(n){
+  car.updateMatrixWorld();
+  tips.forEach(function(t,i){ t.getWorldPosition(tipWorld[i]); });
+  var spawned=0;
+  for(var i=0;i<flames.length && spawned<n;i++){ var f=flames[i]; if(f.life>0) continue;
+    var tw=tipWorld[spawned%tips.length];
+    f.s.position.copy(tw); f.s.visible=true; f.life=1; f.v.set((Math.random()-.5)*.6,(Math.random())*.4,-(2.6+Math.random()*2.4)); f.s.scale.setScalar(.25+Math.random()*.25); spawned++; }
+  flameLight.intensity = 5;
+}
+
+/* ---------- reflections: capture the shop as an environment map ---------- */
+var pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(scene, 0.03).texture;
+/* redraw sign once web fonts load */
+function drawSign(g,w,h){ g.clearRect(0,0,w,h); g.fillStyle='#000'; g.fillRect(0,0,w,h);
+  g.fillStyle='#e8eaee'; g.font='900 150px "Big Shoulders Display", Impact, sans-serif'; g.textAlign='center'; g.textBaseline='middle';
+  g.fillText('RATED R', w/2, h*0.44); g.font='500 44px "Archivo", Arial, sans-serif'; g.fillStyle='#9aa3b5'; g.fillText('P E R F O R M A N C E', w/2, h*0.84); }
+if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(function(){ var c=signTex.image; drawSign(c.getContext('2d'),c.width,c.height); signTex.needsUpdate=true; }); }
+
+/* ---------- camera path & look controls ---------- */
+var camStart = new THREE.Vector3(0,1.7,frontZ+11);
+var camEnd = new THREE.Vector3(5.0,1.6,CAR_Z+5.6);
+var lookStart = new THREE.Vector3(0,2.2,0);
+var lookEnd = new THREE.Vector3(0,.8,CAR_Z);
+camera.position.copy(camStart); camera.lookAt(lookStart);
+
+var walk = {t:0, running:false, done:false, dur: reduce?0.01:5.2};
+var orbit = {yaw:0, pitch:0, tyaw:0, tpitch:0};
+var dragging=false, lx=0, ly=0;
+canvas.addEventListener('pointerdown', function(e){ if(!walk.done) return; dragging=true; lx=e.clientX; ly=e.clientY; });
+window.addEventListener('pointermove', function(e){ if(!dragging) return; orbit.tyaw += (e.clientX-lx)*.005; orbit.tpitch += (e.clientY-ly)*.003; orbit.tyaw=Math.max(-1.1,Math.min(1.1,orbit.tyaw)); orbit.tpitch=Math.max(-.25,Math.min(.35,orbit.tpitch)); lx=e.clientX; ly=e.clientY; });
+window.addEventListener('pointerup', function(){ dragging=false; });
+
+function ease(t){ return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2; }
+
+/* ---------- engine audio (synthesized cammed V8) ---------- */
+var audio=null, muted=false;
+function initAudio(){
+  if(audio) return;
+  var AC = window.AudioContext||window.webkitAudioContext; if(!AC) return;
+  var ctx=new AC();
+  var master=ctx.createGain(); master.gain.value=0.0; master.connect(ctx.destination);
+  var comp=ctx.createDynamicsCompressor(); comp.connect(master);
+  var lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=500; lp.Q.value=4; lp.connect(comp);
+  var shaper=ctx.createWaveShaper(); var curve=new Float32Array(1024); for(var i=0;i<1024;i++){ var x=i/512-1; curve[i]=Math.tanh(x*3.2); } shaper.curve=curve; shaper.connect(lp);
+  var lope=ctx.createGain(); lope.gain.value=.6; lope.connect(shaper);
+  var o1=ctx.createOscillator(); o1.type='sawtooth';
+  var o2=ctx.createOscillator(); o2.type='square';
+  var o3=ctx.createOscillator(); o3.type='sawtooth';
+  var g1=ctx.createGain(); g1.gain.value=.5; var g2=ctx.createGain(); g2.gain.value=.35; var g3=ctx.createGain(); g3.gain.value=.22;
+  o1.connect(g1).connect(lope); o2.connect(g2).connect(lope); o3.connect(g3).connect(lope);
+  // cam lope: amplitude wobble
+  var lfo=ctx.createOscillator(); lfo.type='square'; lfo.frequency.value=3.2;
+  var lfoAmt=ctx.createGain(); lfoAmt.gain.value=.38; lfo.connect(lfoAmt).connect(lope.gain);
+  // noise (intake/exhaust rasp)
+  var nb=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate), d=nb.getChannelData(0); for(var k=0;k<d.length;k++) d[k]=Math.random()*2-1;
+  var noise=ctx.createBufferSource(); noise.buffer=nb; noise.loop=true;
+  var nbp=ctx.createBiquadFilter(); nbp.type='bandpass'; nbp.frequency.value=900; nbp.Q.value=.8;
+  var ng=ctx.createGain(); ng.gain.value=.05; noise.connect(nbp).connect(ng).connect(comp);
+  [o1,o2,o3,lfo,noise].forEach(function(o){ o.start(); });
+  audio={ctx:ctx, master:master, lp:lp, o1:o1, o2:o2, o3:o3, lfo:lfo, lfoAmt:lfoAmt, ng:ng, nbp:nbp, nb:nb};
+}
+function pop(){
+  if(!audio||muted) return;
+  var c=audio.ctx, s=c.createBufferSource(); s.buffer=audio.nb;
+  var f=c.createBiquadFilter(); f.type='lowpass'; f.frequency.value=700+Math.random()*900;
+  var g=c.createGain(); var t=c.currentTime; g.gain.setValueAtTime(.9,t); g.gain.exponentialRampToValueAtTime(.001,t+.09+Math.random()*.06);
+  s.connect(f).connect(g).connect(audio.master); s.start(t, Math.random()); s.stop(t+.2);
+}
+function updateAudio(rpm, load){
+  if(!audio) return;
+  var t=audio.ctx.currentTime;
+  var fire = rpm/60*4; // V8 firing frequency
+  audio.o1.frequency.setTargetAtTime(fire, t, .03);
+  audio.o2.frequency.setTargetAtTime(fire*.5, t, .03);
+  audio.o3.frequency.setTargetAtTime(fire*1.01, t, .03);
+  audio.lp.frequency.setTargetAtTime(260 + rpm*.26 + load*700, t, .05);
+  var lopeAmt = Math.max(0, 1 - (rpm-900)/1600) * .42; // heavy lope near idle, smooths out with rpm
+  audio.lfoAmt.gain.setTargetAtTime(lopeAmt, t, .1);
+  audio.lfo.frequency.setTargetAtTime(2.6 + Math.random()*1.4, t, .2);
+  audio.ng.gain.setTargetAtTime(.02 + load*.08 + rpm/MAXRPM*.05, t, .05);
+  audio.nbp.frequency.setTargetAtTime(600+rpm*.3, t, .05);
+  audio.master.gain.setTargetAtTime(muted?0:(.16 + load*.22 + rpm/MAXRPM*.12), t, .05);
+}
+var muteBtn=document.getElementById('mute');
+muteBtn.addEventListener('click', function(){ muted=!muted; muteBtn.textContent=muted?'Sound off':'Sound on'; muteBtn.setAttribute('aria-pressed',muted); if(audio) updateAudio(engine.rpm,0); });
+
+/* ---------- engine sim ---------- */
+var IDLE=850;
+var engine={rpm:0, running:false, throttle:0, prev:0, popCool:0, peakHp:0, trace:[]};
+function wheelHp(rpm){ // made-up but believable cammed LT curve peaking ~612whp @6400
+  var x=rpm/1000; var tq = 520 + 70*Math.sin((x-1.2)/5*Math.PI) - Math.max(0,x-6.2)*120; return Math.max(0, tq*rpm/5252*1.02 - 40); }
+
+var revBtn=document.getElementById('rev');
+function press(e){ e.preventDefault(); initAudio(); if(audio&&audio.ctx.state==='suspended') audio.ctx.resume(); engine.throttle=1; revBtn.classList.add('on'); if(!engine.running) startEngine(); }
+function release(){ engine.throttle=0; revBtn.classList.remove('on'); }
+revBtn.addEventListener('pointerdown', press);
+window.addEventListener('pointerup', release); revBtn.addEventListener('pointerleave', release); window.addEventListener('pointercancel', release);
+revBtn.addEventListener('keydown', function(e){ if((e.key===' '||e.key==='Enter')&&!e.repeat){ press(e); } });
+revBtn.addEventListener('keyup', function(e){ if(e.key===' '||e.key==='Enter') release(); });
+window.addEventListener('keydown', function(e){ if(e.key==='r'&&!e.repeat&&walk.done&&document.activeElement.tagName!=='INPUT'&&document.activeElement.tagName!=='TEXTAREA'){ press(e); }});
+window.addEventListener('keyup', function(e){ if(e.key==='r') release(); });
+
+function startEngine(){
+  engine.running=true; engine.rpm=1400;
+  headMat.emissiveIntensity=3;
+  burst(8); pop(); setTimeout(pop,80);
+}
+
+/* ---------- monitor drawing ---------- */
+function drawMonitor(){
+  var g=monG, w=monC.width, h=monC.height;
+  g.fillStyle='#050814'; g.fillRect(0,0,w,h);
+  g.strokeStyle='rgba(63,91,255,.25)'; g.lineWidth=1;
+  for(var x=40;x<w;x+=47){ g.beginPath(); g.moveTo(x,30); g.lineTo(x,h-30); g.stroke(); }
+  for(var y=30;y<h-20;y+=36){ g.beginPath(); g.moveTo(40,y); g.lineTo(w-10,y); g.stroke(); }
+  g.fillStyle='#7d95ff'; g.font='700 20px Arial'; g.fillText('DYNO RUN  ·  RATED R', 42, 22);
+  g.fillStyle='#eef0f3'; g.font='700 30px Arial'; g.textAlign='right'; g.fillText(Math.round(engine.peakHp)+' WHP', w-14, 24); g.textAlign='left';
+  var tr=engine.trace; if(tr.length>1){
+    g.strokeStyle='#5d78ff'; g.lineWidth=3; g.beginPath();
+    tr.forEach(function(p,i){ var px=40+(p[0]/MAXRPM)*(w-50), py=(h-30)-(p[1]/700)*(h-70); if(i) g.lineTo(px,py); else g.moveTo(px,py); }); g.stroke();
+  }
+  monTex.needsUpdate=true;
+}
+drawMonitor();
+
+/* ---------- resize ---------- */
+function resize(){ var w=canvas.clientWidth, h=canvas.clientHeight; renderer.setSize(w,h,false); camera.aspect=w/h; camera.fov = w<700?62:50; camera.updateProjectionMatrix(); }
+window.addEventListener('resize', resize); resize();
+
+/* ---------- enter ---------- */
+document.getElementById('enterBtn').addEventListener('click', function(){
+  initAudio(); if(audio&&audio.ctx.state==='suspended') audio.ctx.resume();
+  document.getElementById('enter').classList.add('gone');
+  walk.running=true;
+});
+
+/* ---------- loop ---------- */
+var clock=new THREE.Clock(), tmpLook=new THREE.Vector3(), camPos=new THREE.Vector3(), visible=true;
+new IntersectionObserver(function(en){ visible=en[0].isIntersecting; }).observe(hero);
+var lastDraw=0;
+
+function tick(){
+  requestAnimationFrame(tick);
+  var dt=Math.min(clock.getDelta(),.05);
+  if(!visible) return;
+  var now=clock.elapsedTime;
+
+  // walk-in
+  if(walk.running && !walk.done){
+    walk.t += dt/walk.dur;
+    var doorT = Math.min(1, walk.t*2.2);
+    door.position.y = doorH/2 + ease(doorT)*doorH*.95;
+    if(walk.t>=1){ walk.t=1; walk.done=true; hero.classList.add('inside'); startEngine(); }
+  }
+  var wt = ease(Math.max(0,(walk.t-.18)/.82));
+  camPos.lerpVectors(camStart, camEnd, wt);
+  camPos.y += Math.sin(wt*Math.PI*6)*.035*(1-wt); // footstep bob
+  tmpLook.lerpVectors(lookStart, lookEnd, wt);
+
+  orbit.yaw += (orbit.tyaw-orbit.yaw)*.08; orbit.pitch += (orbit.tpitch-orbit.pitch)*.08;
+  if(walk.done){
+    var idleSway = reduce?0:Math.sin(now*.25)*.06;
+    var dx=camPos.x-lookEnd.x, dz=camPos.z-lookEnd.z, r=Math.hypot(dx,dz), a0=Math.atan2(dx,dz)+orbit.yaw+idleSway;
+    camPos.x=lookEnd.x+Math.sin(a0)*r; camPos.z=lookEnd.z+Math.cos(a0)*r; camPos.y+=orbit.pitch*4;
+  }
+  camera.position.copy(camPos);
+
+  // engine
+  if(engine.running){
+    var target = engine.throttle ? 7200 : IDLE;
+    var rate = engine.throttle ? (2600 + (7200-engine.rpm)*.9) : 3400;
+    if(engine.rpm < target) engine.rpm = Math.min(target, engine.rpm + rate*dt);
+    else engine.rpm = Math.max(target, engine.rpm - rate*dt);
+    if(engine.throttle && engine.rpm>6900) engine.rpm -= Math.random()*450; // limiter bounce
+    var falling = engine.prev - engine.rpm;
+    engine.popCool -= dt;
+    if(!engine.throttle && engine.rpm>2200 && falling>0 && engine.popCool<=0){
+      if(Math.random() < .35){ burst(6+Math.random()*8|0); pop(); }
+      engine.popCool = .06+Math.random()*.12;
+    }
+    if(engine.throttle && engine.rpm>6850 && Math.random()<.25){ burst(4); pop(); }
+    engine.prev = engine.rpm;
+    var hp = engine.rpm>1500 ? wheelHp(engine.rpm) : 0;
+    if(engine.throttle){ if(engine.rpm<1800) engine.trace=[]; engine.trace.push([engine.rpm,hp]); if(engine.trace.length>400) engine.trace.shift(); engine.peakHp=Math.max(engine.peakHp,hp); }
+    var load = engine.throttle?1:0;
+    updateAudio(engine.rpm, load);
+
+    // HUD
+    var jitter = engine.rpm<1100 ? Math.sin(now*22)*40 : 0;
+    var shown = Math.max(0,engine.rpm+jitter);
+    needle.setAttribute('transform','rotate('+(ang(shown)+90)+' 100 100)');
+    rpmOut.textContent = Math.round(shown/10)*10;
+    hpOut.textContent = Math.round(engine.throttle?hp:engine.peakHp);
+
+    // car motion
+    var shake = (engine.rpm<1200? .006 : .0025 + engine.rpm/MAXRPM*.006);
+    if(reduce) shake=0;
+    body.position.y = (Math.random()-.5)*shake;
+    body.rotation.x = Math.sin(now*9)*shake*1.4 + (engine.throttle? .006:0); // torque twist
+    var wheelSpeed = Math.max(0,engine.rpm-IDLE)/MAXRPM * (engine.throttle?60:40);
+    wheels.forEach(function(w){ if(w.rear) w.spin.rotation.z -= wheelSpeed*dt; });
+    rollers.forEach(function(r){ r.rotation.x += wheelSpeed*dt*1.3; });
+    blades.rotation.z += (6 + engine.rpm/MAXRPM*30)*dt;
+    tailMat.emissiveIntensity = engine.throttle? 2.6 : 1.6;
+    tipMat.emissive.setRGB(Math.min(.5,engine.rpm/MAXRPM*.5)*(engine.throttle?1:.6), .08*engine.rpm/MAXRPM, 0);
+    if(now-lastDraw>.08){ drawMonitor(); lastDraw=now; }
+  }
+
+  // flames
+  var active=0, avg=new THREE.Vector3();
+  flames.forEach(function(f){ if(f.life<=0) return; f.life-=dt*4.2; f.s.position.addScaledVector(f.v,dt); f.s.material.opacity=Math.max(0,f.life); f.s.scale.multiplyScalar(1+dt*2.5); if(f.life<=0){ f.s.visible=false; } else { active++; avg.add(f.s.position); } });
+  if(active){ avg.multiplyScalar(1/active); flameLight.position.copy(avg); }
+  flameLight.intensity *= .82;
+
+  // sign flicker, subtle
+  signGlow.intensity = 3.2 + (reduce?0:Math.sin(now*3)*.15);
+
+  camera.lookAt(tmpLook);
+  renderer.render(scene,camera);
+}
+tick();
+
+// autostart without sound if user scrolls past the prompt
+window.addEventListener('scroll', function once(){ if(window.scrollY>80 && !walk.running){ document.getElementById('enter').classList.add('gone'); walk.running=true; } }, {passive:true});
+})();
+</script>
+</body>
+</html>
