@@ -32,6 +32,7 @@ img{ max-width:100%; }
 .bar{ position:fixed; top:0; left:0; right:0; z-index:20; padding:calc(env(safe-area-inset-top,0px) + 14px) clamp(16px,4vw,40px) 14px; display:flex; align-items:center; justify-content:space-between; pointer-events:none; }
 .bar > *{ pointer-events:auto; }
 .mark{ font-family:var(--display); font-weight:900; font-size:26px; letter-spacing:.02em; text-decoration:none; line-height:1; }
+.mark img{ display:block; height:40px; width:auto; }
 .mark span{ display:block; font-weight:500; font-size:11px; letter-spacing:.42em; color:var(--steel-lt); margin-top:3px; }
 .call{ font-family:var(--display); font-weight:700; font-size:18px; text-decoration:none; padding:9px 16px; border:1.5px solid var(--glow); border-radius:3px; background:rgba(3,4,5,.55); backdrop-filter:blur(6px); }
 .call:hover{ background:var(--trace); border-color:var(--trace); }
@@ -139,7 +140,7 @@ footer .wrap{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:1
 <body>
 
 <header class="bar">
-  <a class="mark" href="#top" aria-label="Rated R Performance home">RATED R<span>PERFORMANCE</span></a>
+  <a class="mark" href="#top" aria-label="Rated R Performance home"><img src="logo.png" alt="Rated R Performance"></a>
   <a class="call" href="tel:+12104043594">(210) 404-3594</a>
 </header>
 
@@ -384,11 +385,12 @@ outside.rotation.x=-Math.PI/2; outside.position.set(0,-0.01,frontZ+15); scene.ad
 /* exterior sign above door */
 var signTex = canvasTex(1024,256,function(g,w,h){
   g.fillStyle='#000'; g.fillRect(0,0,w,h);
-  g.fillStyle='#e8eaee'; g.font='900 150px "Big Shoulders Display", Impact, sans-serif'; g.textAlign='center'; g.textBaseline='middle';
-  g.fillText('RATED R', w/2, h*0.44);
-  g.font='500 44px "Archivo", Arial, sans-serif'; g.fillStyle='#9aa3b5';
-  g.fillText('P E R F O R M A N C E', w/2, h*0.84);
 });
+var logoImg = new Image();
+logoImg.onload = function(){ var c=signTex.image, g=c.getContext('2d'); g.fillStyle='#000'; g.fillRect(0,0,c.width,c.height);
+  var sh=c.height*0.8, sw=sh*logoImg.width/logoImg.height; if(sw>c.width*0.92){ sw=c.width*0.92; sh=sw*logoImg.height/logoImg.width; }
+  g.drawImage(logoImg,(c.width-sw)/2,(c.height-sh)/2,sw,sh); signTex.needsUpdate=true; };
+logoImg.src = 'logo.png';
 var outSign = new THREE.Mesh(new THREE.PlaneGeometry(5,1.25), new THREE.MeshBasicMaterial({map:signTex}));
 outSign.rotation.y = Math.PI; outSign.position.set(0, doorH+0.95, frontZ+0.05);
 outSign.rotation.y = 0; outSign.position.z = frontZ+0.06;
@@ -556,11 +558,6 @@ function burst(n){
 /* ---------- reflections: capture the shop as an environment map ---------- */
 var pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(scene, 0.03).texture;
-/* redraw sign once web fonts load */
-function drawSign(g,w,h){ g.clearRect(0,0,w,h); g.fillStyle='#000'; g.fillRect(0,0,w,h);
-  g.fillStyle='#e8eaee'; g.font='900 150px "Big Shoulders Display", Impact, sans-serif'; g.textAlign='center'; g.textBaseline='middle';
-  g.fillText('RATED R', w/2, h*0.44); g.font='500 44px "Archivo", Arial, sans-serif'; g.fillStyle='#9aa3b5'; g.fillText('P E R F O R M A N C E', w/2, h*0.84); }
-if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(function(){ var c=signTex.image; drawSign(c.getContext('2d'),c.width,c.height); signTex.needsUpdate=true; }); }
 
 /* ---------- camera path & look controls ---------- */
 var camStart = new THREE.Vector3(0,1.7,frontZ+11);
