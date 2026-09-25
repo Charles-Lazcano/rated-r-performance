@@ -283,10 +283,12 @@ footer .wrap{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:1
   <div class="wrap">
     <span>© <span id="yr"></span> Rated R Performance · San Antonio, Texas</span>
     <span>Late model domestic performance, dyno tuning and auto repair</span>
+    <span>3D car: <a href="https://sketchfab.com/3d-models/2019-chevrolet-corvette-zr1-92b1b185b0d44847b0d099a787f8ed12" target="_blank" rel="noopener">2019 Chevrolet Corvette ZR1</a> by <a href="https://sketchfab.com/ddiaz-design" target="_blank" rel="noopener">Ddiaz Design</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a></span>
   </div>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script>
 (function(){
 document.getElementById('yr').textContent = new Date().getFullYear();
@@ -426,14 +428,18 @@ var dyno = new THREE.Group(); scene.add(dyno);
 var steel = new THREE.MeshStandardMaterial({color:0x2a2d33, metalness:.8, roughness:.35});
 var tread = canvasTex(128,128,function(g,w,h){ g.fillStyle='#34373d'; g.fillRect(0,0,w,h); g.fillStyle='#50545c'; for(var y=0;y<h;y+=16)for(var x=(y/16%2)*8;x<w;x+=16){ g.save(); g.translate(x,y); g.rotate(.7); g.fillRect(-5,-1.5,10,3); g.restore(); } });
 tread.wrapS=tread.wrapT=THREE.RepeatWrapping; tread.repeat.set(4,8);
-var deck = new THREE.Mesh(new THREE.BoxGeometry(3.4,.12,7.2), new THREE.MeshStandardMaterial({map:tread, metalness:.7, roughness:.45}));
-deck.position.set(0,.06,CAR_Z); deck.receiveShadow=true; dyno.add(deck);
+var DECK_TOP = .12, AXLE_Z = CAR_Z-1.5, PIT = .6; // roller pit half-length around the rear axle
+var deckMat = new THREE.MeshStandardMaterial({map:tread, metalness:.7, roughness:.45});
+[[AXLE_Z+PIT, CAR_Z+3.6], [CAR_Z-3.6, AXLE_Z-PIT]].forEach(function(r){
+  var d=new THREE.Mesh(new THREE.BoxGeometry(3.4,DECK_TOP,r[1]-r[0]), deckMat); d.position.set(0,DECK_TOP/2,(r[0]+r[1])/2); d.receiveShadow=true; dyno.add(d); });
+var pit = new THREE.Mesh(new THREE.PlaneGeometry(3.4,PIT*2), new THREE.MeshStandardMaterial({color:0x08090b, roughness:.9}));
+pit.rotation.x=-Math.PI/2; pit.position.set(0,.004,AXLE_Z); pit.receiveShadow=true; dyno.add(pit);
 var ramp = new THREE.Mesh(new THREE.BoxGeometry(3.4,.06,1.2), steel); ramp.position.set(0,.03,CAR_Z+4.1); ramp.rotation.x=.08; dyno.add(ramp);
 var rollerMat = new THREE.MeshStandardMaterial({color:0x9da3ab, metalness:.9, roughness:.25});
 var rollers = [];
-var REAR_Z = CAR_Z + 1.35; // car rear axle (car faces -z? we set car front toward camera)
-function addRoller(z){ var r=new THREE.Mesh(new THREE.CylinderGeometry(.28,.28,3.1,24), rollerMat); r.rotation.z=Math.PI/2; r.position.set(0,.13,z); dyno.add(r); rollers.push(r);
-  var stripe=new THREE.Mesh(new THREE.BoxGeometry(3.12,.04,.06), new THREE.MeshStandardMaterial({color:0xe3262f})); r.add(stripe); stripe.position.y=.27; }
+var ROLLER_R = .28, ROLLER_GAP = .28, ROLLER_Y = -.1; // tops sit 6cm above the deck
+function addRoller(z){ var r=new THREE.Mesh(new THREE.CylinderGeometry(ROLLER_R,ROLLER_R,3.1,24), rollerMat); r.rotation.z=Math.PI/2; r.position.set(0,ROLLER_Y,z); dyno.add(r); rollers.push(r);
+  var stripe=new THREE.Mesh(new THREE.BoxGeometry(.06,3.12,.04), new THREE.MeshStandardMaterial({color:0xe3262f})); r.add(stripe); stripe.position.z=ROLLER_R-.01; } // along the roller axis (local y)
 // straps
 var strapMat = new THREE.MeshStandardMaterial({color:0xc2161f, roughness:.8});
 
@@ -497,7 +503,7 @@ car.rotation.y = -Math.PI/2; // local +x (front) -> world +z
 car.position.set(0,0,CAR_Z);
 scene.add(car);
 // rollers under rear wheels (world z = CAR_Z - 1.5)
-addRoller(CAR_Z-1.5-.28); addRoller(CAR_Z-1.5+.28);
+addRoller(AXLE_Z-ROLLER_GAP); addRoller(AXLE_Z+ROLLER_GAP);
 // tie-down straps (front)
 [-.95,.95].forEach(function(x){ var s=new THREE.Mesh(new THREE.BoxGeometry(.05,.03,1.4), strapMat); s.position.set(x,.35,CAR_Z+2.3); s.rotation.x=.42; scene.add(s); });
 
@@ -558,6 +564,82 @@ function burst(n){
 /* ---------- reflections: capture the shop as an environment map ---------- */
 var pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(scene, 0.03).texture;
+
+/* ---------- licensed Corvette model (the procedural car above is the fallback) ----------
+   Model: "2019 Chevrolet Corvette ZR1" by Ddiaz Design, CC-BY-4.0, via Sketchfab.
+   assets/car.glb is built by tools/build-model.mjs: nodes body, calipers, wheel_FL/FR/RL/RR
+   (each wheel pivoted on its own center) and materials headlight / taillight. */
+var CAR_LEN = 4.6, REAR_AXLE_X = -1.5; // car-local: +x is the nose, rear axle over the rollers
+function loadCarModel(){
+  if(!THREE.GLTFLoader) return;
+  new THREE.GLTFLoader().load(window.CAR_GLB || 'assets/car.glb', function(gltf){
+    try{ fitCarModel(gltf.scene); }catch(err){ console.warn('[car.glb] could not fit model, keeping placeholder', err); }
+  }, undefined, function(err){ console.warn('[car.glb] failed to load, keeping placeholder', err); });
+}
+function fitCarModel(model){
+  var names=[], nodes={};
+  model.traverse(function(o){ names.push(o.name||'('+o.type+')'); if(o.name) nodes[o.name]=o;
+    if(!o.isMesh) return;
+    o.castShadow=true; o.receiveShadow=true;
+    var m=o.material;
+    if(m.transmission){ m.transmission=0; m.transparent=true; m.depthWrite=false; } // plain alpha glass: no extra transmission pass on phones
+  });
+  console.log('[car.glb] nodes: '+names.join(', '));
+  var wn = {FL:nodes.wheel_FL, FR:nodes.wheel_FR, RL:nodes.wheel_RL, RR:nodes.wheel_RR};
+  if(!wn.FL||!wn.FR||!wn.RL||!wn.RR) throw new Error('wheel nodes not found');
+
+  var v=new THREE.Vector3(), box=new THREE.Box3();
+  function mid(a,b,space){ space.updateMatrixWorld(true); var p=box.setFromObject(a).getCenter(new THREE.Vector3()); return p.add(box.setFromObject(b).getCenter(v)).multiplyScalar(.5); }
+
+  // orient: front axle toward local +x, then scale to CAR_LEN, center, lowest point at y=0
+  var holder=new THREE.Group(); holder.add(model);
+  var dir=mid(wn.FL,wn.FR,holder).sub(mid(wn.RL,wn.RR,holder));
+  holder.rotation.y=Math.atan2(dir.z,dir.x);
+  holder.updateMatrixWorld(true); box.setFromObject(holder); box.getSize(v);
+  holder.scale.setScalar(CAR_LEN/v.x);
+  holder.updateMatrixWorld(true); box.setFromObject(holder); box.getCenter(v);
+  holder.position.set(-v.x, -box.min.y, -v.z);
+
+  // seat it: rear tires in the roller cradle, front tires on the deck
+  var rear=mid(wn.RL,wn.RR,holder), front=mid(wn.FL,wn.FR,holder);
+  var rR=box.setFromObject(wn.RL).getSize(v).y/2, rF=box.setFromObject(wn.FL).getSize(v).y/2;
+  var hR=ROLLER_Y+Math.sqrt(Math.pow(rR+ROLLER_R,2)-ROLLER_GAP*ROLLER_GAP), hF=DECK_TOP+rF, wb=front.x-rear.x;
+  var seat=new THREE.Group(); seat.position.set(REAR_AXLE_X,hR,0);
+  seat.rotation.z=Math.atan2(hF-hR,wb)-Math.atan2(front.y-rear.y,wb); // pivot on the rear axle
+  holder.position.x-=rear.x; holder.position.y-=rear.y;
+  seat.add(holder);
+
+  // swap the placeholder out
+  body.children.slice().forEach(function(c){ body.remove(c); });
+  wheels.forEach(function(w){ car.remove(w.g); }); wheels.length=0;
+  body.add(seat); car.updateMatrixWorld(true);
+
+  // wheels ride with the car, not the body shake; each spins about its own center
+  [['FL',0],['FR',0],['RL',1],['RR',1]].forEach(function(k){
+    var w=wn[k[0]], pivot=new THREE.Group();
+    car.worldToLocal(box.setFromObject(w).getCenter(pivot.position));
+    car.add(pivot); pivot.updateMatrixWorld(true); pivot.attach(w);
+    wheels.push({g:pivot, spin:pivot, rear:!!k[1]});
+  });
+  if(nodes.calipers) car.attach(nodes.calipers);
+
+  // exhaust: four anchors under the rear bumper, centered (the model has no named outlets)
+  car.updateMatrixWorld(true); box.setFromObject(nodes.body||model);
+  var tail=car.worldToLocal(box.min.clone()).x; // car-local x of the rear-most point
+  tail=Math.min(tail, car.worldToLocal(box.max.clone()).x);
+  tips.length=0;
+  EXHAUST.z.forEach(function(z){ var a=new THREE.Object3D(); a.position.set(tail+EXHAUST.inset, EXHAUST.y, z); body.add(a); tips.push(a); });
+
+  // lights: the page's headMat/tailMat logic now drives the model's lamps
+  model.traverse(function(o){ if(!o.isMesh) return; var m=o.material;
+    if(m.name==='headlight'){ m.emissive.setHex(0xdfe8ff).multiplyScalar(4); m.emissiveMap=m.map; /* the lamp texture is mostly dark */ m.emissiveIntensity=headMat.emissiveIntensity; m.needsUpdate=true; headMat=m; }
+    if(m.name==='taillight'){ m.emissive.setHex(0xe3262f); m.emissiveMap=m.map; m.emissiveIntensity=tailMat.emissiveIntensity; m.needsUpdate=true; tailMat=m; }
+  });
+
+  window.__car={car:car, seat:seat, tips:tips, wheels:wheels, camera:camera}; // for debugging from the console
+}
+var EXHAUST = {y:.36, inset:.05, z:[-.26,-.09,.09,.26]};
+loadCarModel();
 
 /* ---------- camera path & look controls ---------- */
 var camStart = new THREE.Vector3(0,1.7,frontZ+11);
