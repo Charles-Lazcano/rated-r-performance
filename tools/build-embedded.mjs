@@ -1,5 +1,5 @@
 // Single-file build for hosts that only take one HTML file (claude.ai artifacts):
-// inlines assets/car.glb and logo.png as data URIs.
+// inlines assets/car.glb, logo.png and the favicons as data URIs.
 //   node build-embedded.mjs  ->  ../rated-r-performance.embedded.html  (must stay under 16 MB)
 import { readFileSync, writeFileSync } from 'node:fs';
 
@@ -11,6 +11,10 @@ let html = read('index.html').toString('utf8');
 const logo = uri('logo.png', 'image/png');
 const n = html.split("'logo.png'").length + html.split('"logo.png"').length - 2;
 html = html.replaceAll('"logo.png"', `"${logo}"`).replaceAll("'logo.png'", `'${logo}'`);
+for (const f of ['favicon-32.png', 'favicon-512.png', 'apple-touch-icon.png']) {
+  if (!html.includes(`href="${f}"`)) throw new Error(`${f} link not found`);
+  html = html.replace(`href="${f}"`, `href="${uri(f, 'image/png')}"`);
+}
 const three = '<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>';
 if (!html.includes(three)) throw new Error('three.js script tag not found');
 html = html.replace(three, `<script>window.CAR_GLB = '${uri('assets/car.glb', 'model/gltf-binary')}';</script>\n${three}`);
@@ -18,5 +22,5 @@ html = html.replace(three, `<script>window.CAR_GLB = '${uri('assets/car.glb', 'm
 const out = new URL('rated-r-performance.embedded.html', root);
 writeFileSync(out, html);
 const mb = Buffer.byteLength(html) / 1048576;
-console.log(`inlined car.glb + logo.png (${n} refs) -> rated-r-performance.embedded.html ${mb.toFixed(2)} MB`);
+console.log(`inlined car.glb + logo.png + favicons (${n} refs) -> rated-r-performance.embedded.html ${mb.toFixed(2)} MB`);
 if (mb >= 16) { console.error('over the 16 MB single-file limit'); process.exit(1); }
