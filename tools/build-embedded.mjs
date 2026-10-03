@@ -1,5 +1,5 @@
 // Single-file build for hosts that only take one HTML file (claude.ai artifacts):
-// inlines assets/car.glb and the favicons as data URIs (the header sign is already inline SVG).
+// inlines assets/car.glb, the engine recording and the favicons as data URIs (the header sign is already inline SVG).
 //   node build-embedded.mjs  ->  ../rated-r-performance.embedded.html  (must stay under 16 MB)
 import { readFileSync, writeFileSync } from 'node:fs';
 
@@ -14,10 +14,10 @@ for (const [f, type] of [['favicon.svg', 'image/svg+xml'], ['favicon-32.png', 'i
 }
 const three = '<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>';
 if (!html.includes(three)) throw new Error('three.js script tag not found');
-html = html.replace(three, `<script>window.CAR_GLB = '${uri('assets/car.glb', 'model/gltf-binary')}';</script>\n${three}`);
+html = html.replace(three, `<script>window.CAR_GLB = '${uri('assets/car.glb', 'model/gltf-binary')}'; window.ENGINE_AUDIO = '${uri('assets/c7-dyno.mp3', 'audio/mpeg')}';</script>\n${three}`);
 
 const out = new URL('rated-r-performance.embedded.html', root);
 writeFileSync(out, html);
 const mb = Buffer.byteLength(html) / 1048576;
-console.log(`inlined car.glb + favicons -> rated-r-performance.embedded.html ${mb.toFixed(2)} MB`);
+console.log(`inlined car.glb + engine audio + favicons -> rated-r-performance.embedded.html ${mb.toFixed(2)} MB`);
 if (mb >= 16) { console.error('over the 16 MB single-file limit'); process.exit(1); }

@@ -40,7 +40,7 @@ img{ max-width:100%; }
 .mark svg{ display:block; height:68px; width:auto; margin:-13px 0 -13px -12px; }
 @media (max-width:420px){ .mark svg{ height:58px; margin:-11px 0 -11px -10px; } }
 .mark span{ display:block; font-weight:500; font-size:11px; letter-spacing:.42em; color:var(--steel-lt); margin-top:3px; }
-.call{ font-family:var(--display); font-weight:700; font-size:18px; text-decoration:none; padding:9px 16px; border:1.5px solid var(--glow); border-radius:3px; background:rgba(3,4,5,.55); backdrop-filter:blur(6px); }
+.call{ font-family:var(--display); font-weight:700; font-size:18px; text-decoration:none; padding:9px 16px; border:1.5px solid var(--glow); border-radius:3px; background:rgba(3,4,5,.72); }
 .call:hover{ background:var(--trace); border-color:var(--trace); }
 
 /* ---------- hero / 3d ---------- */
@@ -298,6 +298,7 @@ footer .wrap{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:1
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/meshopt_decoder.js"></script>
 <script>
 (function(){
 document.getElementById('yr').textContent = new Date().getFullYear();
@@ -331,10 +332,14 @@ var canvas = document.getElementById('stage');
 var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if(!window.THREE){ hero.classList.add('inside'); document.getElementById('enter').classList.add('gone'); return; }
 
-var renderer = new THREE.WebGLRenderer({canvas:canvas, antialias:true});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+var DPR = window.devicePixelRatio||1, coarse = window.matchMedia('(pointer: coarse)').matches;
+// the pixel ratio steps down if frames run long (see tick), but never so far that edges turn jagged on phones
+var renderer = new THREE.WebGLRenderer({canvas:canvas, antialias:true, powerPreference:'high-performance'});
+var view = {pr:Math.min(DPR,2), max:Math.min(DPR,2), min:Math.min(DPR, DPR>=2?1.25:1), t:0, n:0, hold:0};
+renderer.setPixelRatio(view.pr);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.autoUpdate = false; // redrawn from tick() only while the car is moving
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
@@ -343,6 +348,7 @@ var scene = new THREE.Scene();
 var sky = new THREE.Color(0xc3cad2); // overcast daylight outside the roll-up door
 scene.background = sky;
 var camera = new THREE.PerspectiveCamera(50, 1, 0.1, 120);
+loadCarModel(); // fetch the 3D car while the shop below is being built
 
 function canvasTex(w,h,draw){ var c=document.createElement('canvas'); c.width=w; c.height=h; draw(c.getContext('2d'),w,h); var t=new THREE.CanvasTexture(c); t.encoding=THREE.sRGBEncoding; t.anisotropy=4; return t; }
 function rnd(seed){ return function(){ seed=(seed*16807)%2147483647; return (seed-1)/2147483646; }; } // repeatable noise for textures
@@ -456,12 +462,12 @@ bays.slice(0,-1).forEach(function(z,i){ [-1,1].forEach(function(side){ [3.2,7.6]
 /* ---------- roll-up doors: cream steel, galvanized tracks, pull chains, spiral duct ---------- */
 function rollTexture(){ return canvasTex(64,256,function(g,w,h){ for(var y=0;y<h;y++){ var p=y%21, v=p<2?172:p<4?248:226+Math.sin(p/21*Math.PI)*12; g.fillStyle='rgb('+v+','+Math.round(v*.975)+','+Math.round(v*.91)+')'; g.fillRect(0,y,w,1);} }); }
 var doorTex = rollTexture(); doorTex.wrapT = THREE.RepeatWrapping; doorTex.repeat.set(1,doorH/1.1);
-var door = new THREE.Mesh(new THREE.PlaneGeometry(doorW, doorH), new THREE.MeshStandardMaterial({map:doorTex, metalness:.2, roughness:.5, side:THREE.DoubleSide}));
+var door = new THREE.Mesh(new THREE.PlaneGeometry(doorW, doorH), new THREE.MeshStandardMaterial({map:doorTex, metalness:.2, roughness:.5}));
 door.position.set(0, doorH/2, frontZ-0.06); scene.add(door);
 var d2Tex = rollTexture(); d2Tex.wrapT = THREE.RepeatWrapping; d2Tex.repeat.set(1,doorH/1.1);
-var d2 = new THREE.Mesh(new THREE.PlaneGeometry(door2.x1-door2.x0, doorH), new THREE.MeshStandardMaterial({map:d2Tex, metalness:.2, roughness:.5, side:THREE.DoubleSide}));
-d2.position.set((door2.x0+door2.x1)/2, doorH/2, frontZ-.06); scene.add(d2);
-var d2Out = d2.clone(); d2Out.position.z = frontZ+.07; scene.add(d2Out);
+var d2 = new THREE.Mesh(new THREE.PlaneGeometry(door2.x1-door2.x0, doorH), new THREE.MeshStandardMaterial({map:d2Tex, metalness:.2, roughness:.5}));
+d2.position.set((door2.x0+door2.x1)/2, doorH/2, frontZ-.06); d2.rotation.y=Math.PI; scene.add(d2);
+var d2Out = d2.clone(); d2Out.rotation.y=0; d2Out.position.z = frontZ+.07; scene.add(d2Out);
 var galv = new THREE.MeshStandardMaterial({color:0xb9bec4, metalness:.85, roughness:.35});
 var chainMat = new THREE.MeshStandardMaterial({color:0x9aa0a8, metalness:.9, roughness:.3});
 [[-doorW/2,doorW/2],[door2.x0,door2.x1]].forEach(function(d){
@@ -484,7 +490,7 @@ var SIGN_PAD = -SIGN_VB.x, SIGN_FACE = (SIGN_VB.width-2*SIGN_PAD)/SIGN_VB.width;
 var signTex = canvasTex(2048, Math.round(2048*SIGN_VB.height/SIGN_VB.width), function(){});
 if(signSvg){
   var signImg = new Image();
-  signImg.onload = function(){ var c=signTex.image; c.getContext('2d').drawImage(signImg,0,0,c.width,c.height); signTex.needsUpdate=true; };
+  signImg.onload = function(){ var c=signTex.image; c.getContext('2d').drawImage(signImg,0,0,c.width,c.height); signTex.needsUpdate=true; needsFrame=true; };
   signImg.src = 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(signSvg));
 }
 function shopSign(faceW){ // lightbox + face; returns a group facing +z
@@ -496,13 +502,12 @@ function shopSign(faceW){ // lightbox + face; returns a group facing +z
 var outSign = shopSign(2.5); outSign.position.set(0, doorH+.66, frontZ+.08);
 
 /* ---------- lighting: bright LED shop, daylight from the door, blue sign glow ---------- */
-scene.add(new THREE.HemisphereLight(0xf6f8ff, 0x8d9094, .85));
-var key = new THREE.SpotLight(0xffffff, 1.3, 30, .8, .6, 1.2);
+scene.add(new THREE.HemisphereLight(0xf6f8ff, 0x8d9094, 1.0));
+scene.add(new THREE.AmbientLight(0xffffff, .08));
+var key = new THREE.SpotLight(0xffffff, 1.5, 30, .8, .6, 1.2);
 key.position.set(0, ROOM.ridge-.5, -1); key.target.position.set(0,0,-3.6);
-key.castShadow = true; key.shadow.mapSize.set(1024,1024); key.shadow.bias=-0.0005;
+key.castShadow = true; key.shadow.mapSize.setScalar(coarse?512:1024); key.shadow.bias=-0.0005;
 scene.add(key); scene.add(key.target);
-[[-4,-8],[4,-8],[-4,3],[4,3]].forEach(function(p){ var l=new THREE.PointLight(0xf3f6ff,.42,22,1); l.position.set(p[0],roofY(p[0])-.6,p[1]); scene.add(l); });
-var daylight = new THREE.DirectionalLight(0xfff6ea,.35); daylight.position.set(2,6,30); scene.add(daylight);
 
 /* ---------- right wall: lit sign, tool chest, side door ---------- */
 var SIGN_Z = -6.1;
@@ -552,7 +557,6 @@ var tankMat = new THREE.MeshStandardMaterial({color:0xcfc5ac, metalness:.35, rou
 var tank = cyl(.32,1.75,tankMat,24); tank.position.set(RX+.85,.95,sideDoor.z0+.25);
 var tankTop = new THREE.Mesh(new THREE.SphereGeometry(.32,20,10,0,Math.PI*2,0,Math.PI/2), tankMat); tankTop.position.set(RX+.85,1.82,sideDoor.z0+.25); scene.add(tankTop);
 box(.5,.32,.4,new THREE.MeshStandardMaterial({color:0xb7322b, roughness:.5}),RX+.85,2.08,sideDoor.z0+.25); // motor/pump on top
-var roomLight = new THREE.PointLight(0xfff4e0,.6,5,2); roomLight.position.set(RX+1.5,2.4,sideDoor.z0); scene.add(roomLight);
 // security camera dome up by the ceiling
 var camDome = new THREE.Group(); camDome.position.set(RX-.12,ROOM.h-.45,-9.3); scene.add(camDome);
 var whiteP = new THREE.MeshStandardMaterial({color:0xf2f2f0, roughness:.35});
@@ -566,7 +570,7 @@ box(.42,.22,.38,matte,0,.11,.1,stool); box(.42,.44,.2,matte,0,.22,-.09,stool);
 var teal = new THREE.MeshStandardMaterial({color:0x1f8a96, roughness:.45, metalness:.2});
 var tealFan = new THREE.Group(); tealFan.position.set(RX-.4,.3,-1.05); tealFan.rotation.y=-Math.PI/2-.35; scene.add(tealFan);
 var tring = new THREE.Mesh(new THREE.TorusGeometry(.24,.05,10,28), teal); tealFan.add(tring);
-var tgrill = new THREE.Mesh(new THREE.CircleGeometry(.24,24), new THREE.MeshStandardMaterial({color:0x1b1c1f, roughness:.6, side:THREE.DoubleSide})); tealFan.add(tgrill);
+var tgrill = new THREE.Mesh(new THREE.CircleGeometry(.24,24), new THREE.MeshStandardMaterial({color:0x1b1c1f, roughness:.6})); tealFan.add(tgrill);
 [-1,1].forEach(function(s){ var leg=box(.04,.32,.04,teal,s*.2,-.16,0,tealFan); leg.rotation.z=s*.35; });
 var blue = new THREE.MeshStandardMaterial({color:0x2d63d8, roughness:.35, metalness:.15});
 var mover = new THREE.Group(); mover.position.set(RX-.5,0,-.05); mover.rotation.y=-Math.PI/2-.2; scene.add(mover);
@@ -680,6 +684,42 @@ banner.position.set(0,FAN_Y+1.45,backZ+.06); scene.add(banner);
 // flat material colors above are written as sRGB hex (as picked from the photos); the renderer works in linear
 scene.traverse(function(o){ var m=o.material; if(m && !m.map && m.color && !m.userData.linear){ m.color.convertSRGBToLinear(); m.userData.linear=true; } });
 
+/* ---------- fewer draw calls: bake the static shop into one mesh per material ----------
+   Flat-colored parts share a material per finish (roughness/metalness) with their colors moved into vertex colors;
+   textured parts merge per texture. Moving or see-through parts (door, fan blades, sign faces, glow) stay separate. */
+(function mergeStatic(){
+  var keep = [door].concat(fanBlades), groups = {}, order = [];
+  function moving(o){ for(var p=o; p; p=p.parent) if(keep.indexOf(p)>=0) return true; return false; }
+  scene.updateMatrixWorld(true);
+  scene.traverse(function(o){
+    if(!o.isMesh || moving(o)) return;
+    var m=o.material; if(m.transparent || m.side!==THREE.FrontSide) return;
+    var flat = !m.map && (m.isMeshStandardMaterial || m.isMeshBasicMaterial) && !m.bumpMap && !(m.emissive && m.emissive.getHex());
+    var k = (flat ? [m.type, m.roughness, m.metalness, m.envMapIntensity, m.toneMapped].join('|') : m.uuid)+'|'+o.castShadow+'|'+o.receiveShadow;
+    if(!groups[k]){ groups[k]={flat:flat, mat:m, list:[], cast:o.castShadow, recv:o.receiveShadow}; order.push(k); }
+    groups[k].list.push(o);
+  });
+  order.forEach(function(k){
+    var g=groups[k]; if(g.list.length<2) return;
+    var parts=g.list.map(function(o){
+      var geo=(o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()); geo.applyMatrix4(o.matrixWorld);
+      if(!geo.attributes.uv) geo.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(geo.attributes.position.count*2),2));
+      if(g.flat){ var c=o.material.color, n=geo.attributes.position.count, col=new Float32Array(n*3); for(var i=0;i<n;i++){ col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b; } geo.setAttribute('color', new THREE.BufferAttribute(col,3)); }
+      return geo;
+    });
+    var names=g.flat?['position','normal','uv','color']:['position','normal','uv'], total=0;
+    parts.forEach(function(p){ total+=p.attributes.position.count; });
+    var merged=new THREE.BufferGeometry();
+    names.forEach(function(nm){ var size=parts[0].attributes[nm].itemSize, arr=new Float32Array(total*size), off=0;
+      parts.forEach(function(p){ arr.set(p.attributes[nm].array, off); off+=p.attributes[nm].array.length; });
+      merged.setAttribute(nm, new THREE.BufferAttribute(arr,size)); });
+    var mat=g.mat;
+    if(g.flat){ mat=g.mat.clone(); mat.color.setRGB(1,1,1); mat.vertexColors=true; }
+    var mesh=new THREE.Mesh(merged, mat); mesh.castShadow=g.cast; mesh.receiveShadow=g.recv; mesh.matrixAutoUpdate=false; scene.add(mesh);
+    g.list.forEach(function(o){ o.parent.remove(o); });
+  });
+})();
+
 /* ---------- the car (generic modern muscle coupe) ---------- */
 var car = new THREE.Group();
 var body = new THREE.Group(); car.add(body);
@@ -764,8 +804,22 @@ function burst(n){
 
 /* ---------- reflections: capture the shop as an environment map ---------- */
 var pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(scene, 0.03).texture;
-scene.background = sky; // r128's fromScene clears a color background and never puts it back
+var envScene = new THREE.Scene(); envScene.background = new THREE.Color(0x36383b);
+(function(){
+  function add(geo, color, x, y, z, ry){ var m=new THREE.Mesh(geo, new THREE.MeshBasicMaterial({color:color})); m.position.set(x,y,z); m.rotation.y=ry||0; envScene.add(m); return m; }
+  var fl=add(new THREE.PlaneGeometry(40,40), 0x232427, 0,0,0); fl.rotation.x=-Math.PI/2;
+  add(new THREE.PlaneGeometry(26,4.6), 0x4c4943, RX,2.3,0, -Math.PI/2);       // khaki corrugated wall
+  add(new THREE.PlaneGeometry(26,4.6), 0x575756, -RX,2.3,0, Math.PI/2);       // insulation
+  add(new THREE.PlaneGeometry(22,4.6), 0x575756, 0,2.3,backZ);
+  add(new THREE.PlaneGeometry(22,4.6), 0x646a70, 0,2.3,frontZ, Math.PI);       // open door / daylight
+  var c=add(new THREE.PlaneGeometry(22,26), 0x6c6c6b, 0,ROOM.ridge-.3,0); c.rotation.x=Math.PI/2;
+  var led=new THREE.MeshBasicMaterial({color:new THREE.Color(3,3,3)});
+  bays.slice(0,-1).forEach(function(z){ [-3.2,3.2].forEach(function(x){ var s=new THREE.Mesh(new THREE.BoxGeometry(2.4,.05,.2), led); s.position.set(x,ROOM.ridge-.5,z+1.6); envScene.add(s); }); });
+  var blueGlow=add(new THREE.PlaneGeometry(3,1.6), 0x2f4dff, RX-.05,3.2,SIGN_Z, -Math.PI/2); blueGlow.material.color.multiplyScalar(2);
+  [-1,1].forEach(function(s){ add(new THREE.BoxGeometry(.3,.4,26), 0x3a1715, s*(RX-.2),ROOM.h-.2,0); });
+})();
+scene.environment = pmrem.fromScene(envScene, 0.03, 0.1, 60).texture;
+pmrem.dispose();
 
 /* ---------- licensed Corvette model (the procedural car above is the fallback) ----------
    Model: "2019 Chevrolet Corvette ZR1" by Ddiaz Design, CC-BY-4.0, via Sketchfab.
@@ -774,7 +828,9 @@ scene.background = sky; // r128's fromScene clears a color background and never 
 var CAR_LEN = 4.6, REAR_AXLE_X = -1.5; // car-local: +x is the nose, rear axle over the rollers
 function loadCarModel(){
   if(!THREE.GLTFLoader) return;
-  new THREE.GLTFLoader().load(window.CAR_GLB || 'assets/car.glb', function(gltf){
+  var loader = new THREE.GLTFLoader();
+  if(window.MeshoptDecoder) loader.setMeshoptDecoder(window.MeshoptDecoder); // car.glb geometry is meshopt-compressed (tools/compress-model.mjs)
+  loader.load(window.CAR_GLB || 'assets/car.glb', function(gltf){
     try{ fitCarModel(gltf.scene); }catch(err){ console.warn('[car.glb] could not fit model, keeping placeholder', err); }
   }, undefined, function(err){ console.warn('[car.glb] failed to load, keeping placeholder', err); });
 }
@@ -838,10 +894,10 @@ function fitCarModel(model){
     if(m.name==='taillight'){ m.emissive.setHex(0xe3262f); m.emissiveMap=m.map; m.emissiveIntensity=tailMat.emissiveIntensity; m.needsUpdate=true; tailMat=m; }
   });
 
-  window.__car={car:car, seat:seat, tips:tips, wheels:wheels, camera:camera}; // for debugging from the console
+  renderer.shadowMap.needsUpdate = true; needsFrame = true;
+  window.__car={car:car, seat:seat, tips:tips, wheels:wheels, camera:camera, renderer:renderer}; // for debugging from the console
 }
 var EXHAUST = {y:.36+DECK_TOP-.12, inset:.05, z:[-.26,-.09,.09,.26]};
-loadCarModel();
 
 /* ---------- camera path & look controls ---------- */
 var camStart = new THREE.Vector3(0,1.7,frontZ+11);
@@ -859,13 +915,50 @@ window.addEventListener('pointerup', function(){ dragging=false; });
 
 function ease(t){ return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2; }
 
-/* ---------- engine audio (synthesized cammed V8) ---------- */
+/* ---------- engine audio: a real C7 Corvette dyno recording, played as short grains picked by rpm ----------
+   assets/c7-dyno.mp3 holds a wide-open pull (~2,350-6,500 rpm) and an off-throttle coast-down; tools/build-audio.mjs
+   cuts it and measures the rpm at every 50 ms, which is the table below. Each grain is read from the spot where the
+   recording was at the current rpm and repitched to the exact rpm. The synthesized cammed V8 still covers idle. */
+// <engine-samples>
+var ENGINE_SAMPLES = {"dt":0.05,"on":{"t0":0.15,"rpm":[2376,2385,2393,2400,2423,2445,2467,2486,2506,2527,2552,2570,2589,2608,2628,2648,2668,2686,2704,2722,2742,2763,2782,2802,2822,2842,2861,2879,2897,2915,2932,2950,2967,2984,3002,3019,3037,3055,3074,3093,3115,3137,3160,3185,3212,3240,3267,3293,3319,3347,3376,3402,3428,3454,3480,3502,3522,3551,3579,3606,3632,3667,3703,3742,3771,3802,3833,3865,3888,3909,3941,3971,3999,4027,4057,4092,4129,4156,4183,4212,4244,4275,4304,4333,4361,4391,4419,4447,4476,4506,4536,4568,4599,4631,4663,4692,4722,4751,4779,4806,4833,4863,4896,4928,4959,4990,5021,5050,5085,5116,5147,5180,5211,5244,5281,5309,5338,5367,5398,5431,5464,5493,5519,5543,5577,5610,5639,5668,5697,5728,5765,5790,5820,5850,5881,5915,5948,5977,6006,6032,6059,6086,6112,6138,6163,6188,6212,6235,6274,6311,6345,6378,6407,6433,6456,6470,6494,6519,6530,6543,6563]},"off":{"t0":8.55,"rpm":[5755,5751,5747,5724,5694,5666,5641,5616,5578,5540,5523,5507,5480,5457,5420,5397,5375,5352,5326,5310,5287,5273,5253,5229,5204,5178,5154,5131,5112,5094,5081,5068,5045,5020,4996,4973,4950,4925,4899,4884,4867,4848,4827,4804,4783,4762,4741,4720,4700,4681,4661,4641,4621,4602,4582,4562,4542,4524,4507,4489,4470,4453,4436,4418,4398,4378,4358,4337,4317,4296,4276,4257,4239,4220,4202,4184,4165,4146,4128,4110,4093,4073,4052,4031,4012,3994,3976,3959,3950,3944,3940]}};
+// </engine-samples>
+var GRAIN = .09, HOP = .045;      // 90 ms grains, half-overlapped (triangular windows sum flat)
+var engineBytes = null;           // fetched now, decoded on the first tap (decoding needs the AudioContext)
+if(window.fetch && typeof ENGINE_SAMPLES==='object') fetch(window.ENGINE_AUDIO || 'assets/c7-dyno.mp3').then(function(r){ return r.arrayBuffer(); }).then(function(b){ engineBytes=b; decodeEngine(); }).catch(function(){});
+function decodeEngine(){
+  if(!audio || !engineBytes || audio.samples) return;
+  var bytes=engineBytes; engineBytes=null;
+  audio.ctx.decodeAudioData(bytes, function(buf){ audio.samples=buf; }, function(){ /* keep the synth */ });
+}
+function segRpm(seg, i){ return seg.rpm[Math.max(0,Math.min(seg.rpm.length-1,i))]; }
+function rpmAtHead(seg, head){ var f=head/ENGINE_SAMPLES.dt, i=Math.floor(f); return segRpm(seg,i)+(segRpm(seg,i+1)-segRpm(seg,i))*(f-i); }
+function headForRpm(seg, rpm){ // seg.rpm is monotonic (rising for the pull, falling for the coast-down)
+  var r=seg.rpm, n=r.length, up=r[n-1]>r[0];
+  for(var i=0;i<n-1;i++){ var a=r[i], b=r[i+1]; if(up ? rpm<=b : rpm>=b){ var f=Math.max(0,Math.min(1,(rpm-a)/(b-a))); return (i+f)*ENGINE_SAMPLES.dt; } }
+  return (n-1)*ENGINE_SAMPLES.dt;
+}
+function grain(key, rpm, w, when){
+  var a=audio, seg=ENGINE_SAMPLES[key], head=a.head[key], target=headForRpm(seg,rpm), end=(seg.rpm.length-1)*ENGINE_SAMPLES.dt;
+  if(w<.015){ a.head[key]=null; return; }
+  // read on from the last grain (seamless), unless the rpm has moved away from where that is in the recording
+  if(head===null || Math.abs(head-target)>.12 || head>end) head=target;
+  var rate=Math.max(.45,Math.min(1.9, rpm/rpmAtHead(seg,head)));
+  var c=a.ctx, s=c.createBufferSource(), g=c.createGain();
+  s.buffer=a.samples; s.playbackRate.value=rate;
+  g.gain.setValueAtTime(0,when); g.gain.linearRampToValueAtTime(w,when+GRAIN/2); g.gain.linearRampToValueAtTime(0,when+GRAIN);
+  s.connect(g); g.connect(a.sampleBus);
+  s.start(when, Math.max(0, seg.t0+head-GRAIN*rate/2)); s.stop(when+GRAIN+.01);
+  a.head[key]=head+HOP*rate;
+}
 var audio=null, muted=false;
 function initAudio(){
   if(audio) return;
   var AC = window.AudioContext||window.webkitAudioContext; if(!AC) return;
   var ctx=new AC();
-  var master=ctx.createGain(); master.gain.value=0.0; master.connect(ctx.destination);
+  var out=ctx.createGain(); out.gain.value=muted?0:1; out.connect(ctx.destination);   // mute switch
+  var limiter=ctx.createDynamicsCompressor(); limiter.threshold.value=-4; limiter.knee.value=2; limiter.ratio.value=16; limiter.attack.value=.002; limiter.release.value=.12; limiter.connect(out);
+  var sampleBus=ctx.createGain(); sampleBus.gain.value=1.5; sampleBus.connect(limiter); // recording grains, louder than the idle synth like a real rev
+  var master=ctx.createGain(); master.gain.value=0.0; master.connect(out);           // synth
   var comp=ctx.createDynamicsCompressor(); comp.connect(master);
   var lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=500; lp.Q.value=4; lp.connect(comp);
   var shaper=ctx.createWaveShaper(); var curve=new Float32Array(1024); for(var i=0;i<1024;i++){ var x=i/512-1; curve[i]=Math.tanh(x*3.2); } shaper.curve=curve; shaper.connect(lp);
@@ -884,14 +977,16 @@ function initAudio(){
   var nbp=ctx.createBiquadFilter(); nbp.type='bandpass'; nbp.frequency.value=900; nbp.Q.value=.8;
   var ng=ctx.createGain(); ng.gain.value=.05; noise.connect(nbp).connect(ng).connect(comp);
   [o1,o2,o3,lfo,noise].forEach(function(o){ o.start(); });
-  audio={ctx:ctx, master:master, lp:lp, o1:o1, o2:o2, o3:o3, lfo:lfo, lfoAmt:lfoAmt, ng:ng, nbp:nbp, nb:nb};
+  audio={ctx:ctx, out:out, sampleBus:sampleBus, master:master, lp:lp, o1:o1, o2:o2, o3:o3, lfo:lfo, lfoAmt:lfoAmt, ng:ng, nbp:nbp, nb:nb,
+    samples:null, head:{on:null, off:null}, nextGrain:0, loadS:0};
+  decodeEngine();
 }
 function pop(){
   if(!audio||muted) return;
   var c=audio.ctx, s=c.createBufferSource(); s.buffer=audio.nb;
   var f=c.createBiquadFilter(); f.type='lowpass'; f.frequency.value=700+Math.random()*900;
   var g=c.createGain(); var t=c.currentTime; g.gain.setValueAtTime(.9,t); g.gain.exponentialRampToValueAtTime(.001,t+.09+Math.random()*.06);
-  s.connect(f).connect(g).connect(audio.master); s.start(t, Math.random()); s.stop(t+.2);
+  s.connect(f).connect(g).connect(audio.out); s.start(t, Math.random()); s.stop(t+.2);
 }
 function updateAudio(rpm, load){
   if(!audio) return;
@@ -906,7 +1001,19 @@ function updateAudio(rpm, load){
   audio.lfo.frequency.setTargetAtTime(2.6 + Math.random()*1.4, t, .2);
   audio.ng.gain.setTargetAtTime(.02 + load*.08 + rpm/MAXRPM*.05, t, .05);
   audio.nbp.frequency.setTargetAtTime(600+rpm*.3, t, .05);
-  audio.master.gain.setTargetAtTime(muted?0:(.16 + load*.22 + rpm/MAXRPM*.12), t, .05);
+  // the recording takes over from the synth between ~1,300 and ~2,400 rpm
+  var mix = audio.samples ? Math.max(0,Math.min(1,(rpm-1300)/1100)) : 0;
+  mix = mix*mix*(3-2*mix);
+  audio.master.gain.setTargetAtTime((.16 + load*.22 + rpm/MAXRPM*.12)*(1-mix), t, .05);
+  audio.out.gain.setTargetAtTime(muted?0:1, t, .03);
+  if(!audio.samples) return;
+  audio.loadS += (load-audio.loadS)*.2; // throttle: crossfade pull <-> coast-down recordings
+  if(audio.nextGrain < t) audio.nextGrain = t+.02;
+  while(audio.nextGrain < t+.1){ // schedule ~100 ms ahead
+    grain('on', rpm, audio.loadS*mix, audio.nextGrain);
+    grain('off', rpm, (1-audio.loadS)*mix*.9, audio.nextGrain);
+    audio.nextGrain += HOP;
+  }
 }
 var muteBtn=document.getElementById('mute');
 muteBtn.addEventListener('click', function(){ muted=!muted; muteBtn.textContent=muted?'Sound off':'Sound on'; muteBtn.setAttribute('aria-pressed',muted); if(audio) updateAudio(engine.rpm,0); });
@@ -953,7 +1060,7 @@ function drawMonitor(){
 drawMonitor();
 
 /* ---------- resize ---------- */
-function resize(){ var w=canvas.clientWidth, h=canvas.clientHeight; renderer.setSize(w,h,false); camera.aspect=w/h; camera.fov = w<700?62:50; camera.updateProjectionMatrix(); }
+function resize(){ var w=canvas.clientWidth, h=canvas.clientHeight; renderer.setSize(w,h,false); camera.aspect=w/h; camera.fov = w<700?62:50; camera.updateProjectionMatrix(); needsFrame=true; }
 window.addEventListener('resize', resize); resize();
 
 /* ---------- enter ---------- */
@@ -966,12 +1073,21 @@ document.getElementById('enterBtn').addEventListener('click', function(){
 /* ---------- loop ---------- */
 var clock=new THREE.Clock(), tmpLook=new THREE.Vector3(), camPos=new THREE.Vector3(), visible=true;
 new IntersectionObserver(function(en){ visible=en[0].isIntersecting; }).observe(hero);
-var lastDraw=0;
+var lastDraw=0, needsFrame=true, shadowAge=0;
+renderer.shadowMap.needsUpdate = true;
 
 function tick(){
   requestAnimationFrame(tick);
-  var dt=Math.min(clock.getDelta(),.05);
+  var raw=clock.getDelta(), dt=Math.min(raw,.05);
   if(!visible) return;
+  if(!walk.running && !needsFrame) return; // nothing moves until "Walk into the shop": don't redraw the same frame
+  needsFrame=false;
+  // adaptive resolution: drop the pixel ratio while frames run long, creep back up when there's headroom
+  if(walk.running){ view.t+=raw; view.n++; view.hold-=raw;
+    if(view.t>1.2){ var ft=view.t/view.n;
+      if(ft>1/42 && view.pr>view.min){ view.pr=Math.max(view.min,view.pr-.25); renderer.setPixelRatio(view.pr); resize(); view.hold=8; }
+      else if(ft<1/58 && view.pr<view.max && view.hold<=0){ view.pr=Math.min(view.max,view.pr+.25); renderer.setPixelRatio(view.pr); resize(); view.hold=4; }
+      view.t=0; view.n=0; } }
   var now=clock.elapsedTime;
 
   // walk-in
@@ -1045,6 +1161,7 @@ function tick(){
   // sign flicker, subtle
   signGlow.intensity = signGlowBase + (reduce?0:Math.sin(now*3)*.12);
 
+  shadowAge+=dt; if(shadowAge>(engine.running?.05:.5)){ renderer.shadowMap.needsUpdate=true; shadowAge=0; } // the car only shakes a few mm
   camera.lookAt(tmpLook);
   renderer.render(scene,camera);
 }
