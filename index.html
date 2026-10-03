@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rated R Performance · Dyno Tuning &amp; Performance · San Antonio, TX</title>
 <meta name="description" content="Late model domestic performance in San Antonio. In-house dyno tuning, exhaust, cams, forced induction, engine upgrades, diagnostics and repair. Se habla español.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -35,7 +36,9 @@ img{ max-width:100%; }
 .bar{ position:fixed; top:0; left:0; right:0; z-index:20; padding:calc(env(safe-area-inset-top,0px) + 14px) clamp(16px,4vw,40px) 14px; display:flex; align-items:center; justify-content:space-between; pointer-events:none; }
 .bar > *{ pointer-events:auto; }
 .mark{ font-family:var(--display); font-weight:900; font-size:26px; letter-spacing:.02em; text-decoration:none; line-height:1; }
-.mark img{ display:block; height:40px; width:auto; }
+/* the wall sign SVG carries ~12% padding on each side for its LED halo; pull it back to the gutter */
+.mark svg{ display:block; height:68px; width:auto; margin:-13px 0 -13px -12px; }
+@media (max-width:420px){ .mark svg{ height:58px; margin:-11px 0 -11px -10px; } }
 .mark span{ display:block; font-weight:500; font-size:11px; letter-spacing:.42em; color:var(--steel-lt); margin-top:3px; }
 .call{ font-family:var(--display); font-weight:700; font-size:18px; text-decoration:none; padding:9px 16px; border:1.5px solid var(--glow); border-radius:3px; background:rgba(3,4,5,.55); backdrop-filter:blur(6px); }
 .call:hover{ background:var(--trace); border-color:var(--trace); }
@@ -44,6 +47,8 @@ img{ max-width:100%; }
 .hero{ position:relative; height:100vh; height:100svh; min-height:560px; overflow:hidden; }
 #stage{ position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:pan-y; cursor:grab; }
 #stage:active{ cursor:grabbing; }
+/* the shop is bright now: darken behind the header, headline and HUD so the white type holds up */
+.shade{ position:absolute; inset:0; pointer-events:none; background:linear-gradient(to bottom, rgba(3,4,5,.5), rgba(3,4,5,0) 130px), linear-gradient(to top, rgba(3,4,5,.82), rgba(3,4,5,.35) 38%, rgba(3,4,5,0) 62%), linear-gradient(to right, rgba(3,4,5,.55), rgba(3,4,5,0) 58%); }
 .hero-copy{ position:absolute; left:clamp(16px,4vw,40px); bottom:clamp(150px,22vh,210px); max-width:560px; pointer-events:none; opacity:0; transition:opacity 1.2s ease .2s; }
 .hero.inside .hero-copy{ opacity:1; }
 .hero-copy h1{ font-family:var(--display); font-weight:900; font-size:clamp(46px,8.5vw,104px); line-height:.88; margin:0 0 14px; letter-spacing:-.005em; text-shadow:0 4px 30px rgba(0,0,0,.8); }
@@ -143,13 +148,14 @@ footer .wrap{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:1
 <body>
 
 <header class="bar">
-  <a class="mark" href="#top" aria-label="Rated R Performance home"><img src="logo.png" alt="Rated R Performance"></a>
+  <a class="mark" href="#top" aria-label="Rated R Performance home"><!--sign--><svg xmlns="http://www.w3.org/2000/svg" viewBox="-36 -36 329 164" role="img" aria-label="Rated R Performance"><title>Rated R Performance</title><defs><filter id="rrHalo" filterUnits="userSpaceOnUse" x="-36" y="-36" width="329" height="164"><feGaussianBlur stdDeviation="11"/><feComponentTransfer><feFuncA type="linear" slope="2.2"/></feComponentTransfer></filter><filter id="rrHaloTight" filterUnits="userSpaceOnUse" x="-36" y="-36" width="329" height="164"><feGaussianBlur stdDeviation="3.5"/></filter></defs><rect x="-6" y="-4" width="269" height="100" rx="6" fill="#2f4dff" filter="url(#rrHalo)"/><rect x="-2" y="-1" width="261" height="94" rx="3" fill="#1e3cff" filter="url(#rrHaloTight)"/><rect width="257" height="92" rx="1.5" fill="#f8f8f4"/><rect x="4.5" y="4.5" width="248" height="83" fill="none" stroke="#0b0b0c" stroke-width="2.2"/><rect x="12" y="12" width="174.33" height="52" fill="#0b0b0c"/><path fill="#f8f8f4" d="M21 22.79L21 21.88Q22.23 21.93 24.28 21.97Q26.33 22.02 28.38 22.02Q30.61 22.02 32.68 21.97Q34.75 21.93 35.62 21.93Q40.08 21.93 42.97 22.84Q45.86 23.75 47.32 25.50Q48.78 27.25 48.78 29.85Q48.78 31.49 48.12 33.06Q47.46 34.63 45.89 35.95Q44.31 37.27 41.58 38.05Q40.08 38.46 38.17 38.64Q42.49 38.96 44.68 40.32Q46.86 41.78 47.46 44.60L48.41 49.34Q48.82 51.07 49.28 51.77Q49.73 52.48 50.55 52.44Q51.05 52.44 51.42 52.23Q51.78 52.03 52.15 51.62L52.78 52.21Q51.46 53.62 49.92 54.19Q48.37 54.76 46.32 54.76Q43.63 54.76 41.92 53.71Q40.22 52.66 39.76 49.84L38.99 45.29Q38.71 43.42 38.28 41.96Q37.85 40.50 37.12 39.66Q36.39 38.82 35.07 38.82L32.57 38.82L32.57 49.29Q32.57 50.93 32.82 51.75Q33.07 52.57 33.77 52.84Q34.48 53.12 35.89 53.21L35.89 54.12Q34.62 54.03 32.63 54.01Q30.65 53.98 28.65 53.98Q26.33 53.98 24.28 54.01Q22.23 54.03 21 54.12L21 53.21Q22.41 53.12 23.12 52.84Q23.82 52.57 24.07 51.75Q24.32 50.93 24.32 49.29L24.32 26.71Q24.32 25.02 24.07 24.23Q23.82 23.43 23.12 23.13Q22.41 22.84 21 22.79M32.57 26.71L32.57 37.91L34.16 37.91Q36.66 37.91 37.96 36.88Q39.26 35.86 39.74 34.15Q40.22 32.44 40.22 30.35Q40.22 26.75 39.08 24.77Q37.94 22.79 35.21 22.79Q33.52 22.79 33.04 23.56Q32.57 24.34 32.57 26.71M69.18 21.83L80.20 50.29Q80.88 51.89 81.63 52.53Q82.38 53.16 82.98 53.21L82.98 54.12Q81.52 54.03 79.49 54.01Q77.47 53.98 75.37 53.98Q73.19 53.98 71.23 54.01Q69.27 54.03 68.08 54.12L68.08 53.21Q70.41 53.12 71.04 52.41Q71.68 51.71 70.77 49.38L68.04 41.92L58.48 41.92L57.47 44.51Q56.43 47.24 56.20 48.93Q55.97 50.61 56.43 51.52Q56.88 52.44 57.86 52.80Q58.84 53.16 60.21 53.21L60.21 54.12Q58.61 54.03 57.27 54.01Q55.93 53.98 54.38 53.98Q53.47 53.98 52.53 54.01Q51.60 54.03 50.92 54.12L50.92 53.21Q51.92 53.03 52.94 51.93Q53.97 50.84 54.97 48.15L65.22 21.83Q66.13 21.93 67.20 21.93Q68.27 21.93 69.18 21.83M58.84 41.01L67.72 41.01L63.39 29.21M112.71 21.88Q112.53 24.38 112.46 26.71Q112.39 29.03 112.39 30.26Q112.39 31.26 112.44 32.13Q112.48 32.99 112.53 33.63L111.48 33.63Q110.57 29.58 109.30 27.23Q108.02 24.89 106.40 23.91Q104.79 22.93 102.92 22.93L102.37 22.93L102.37 48.93Q102.37 50.80 102.76 51.71Q103.15 52.62 104.22 52.91Q105.29 53.21 107.34 53.21L107.34 54.12Q105.83 54.07 103.31 54.03Q100.78 53.98 98.05 53.98Q95.36 53.98 92.99 54.03Q90.63 54.07 89.17 54.12L89.17 53.21Q91.22 53.21 92.31 52.91Q93.40 52.62 93.77 51.71Q94.13 50.80 94.13 48.93L94.13 22.93L93.63 22.93Q91.72 22.93 90.12 23.91Q88.53 24.89 87.26 27.21Q85.98 29.53 85.02 33.63L83.98 33.63Q84.07 32.99 84.09 32.13Q84.11 31.26 84.11 30.26Q84.11 29.03 84.05 26.71Q83.98 24.38 83.80 21.88Q85.94 21.93 88.51 21.97Q91.08 22.02 93.63 22.02L102.97 22.02Q105.52 22.02 108.07 21.97Q110.62 21.93 112.71 21.88M140.12 21.88Q139.94 24.02 139.87 26.02Q139.81 28.03 139.81 29.07Q139.81 29.99 139.85 30.85Q139.90 31.72 139.94 32.26L138.89 32.26Q138.39 28.71 137.28 26.66Q136.16 24.61 134.55 23.77Q132.93 22.93 130.97 22.93L129.74 22.93Q128.51 22.93 127.85 23.13Q127.19 23.34 126.99 23.97Q126.78 24.61 126.78 25.98L126.78 37.45L127.74 37.45Q129.06 37.45 130.06 36.88Q131.06 36.32 131.77 35.40Q132.47 34.49 132.93 33.45Q133.38 32.40 133.52 31.44L134.57 31.44Q134.39 34.04 134.41 35.40Q134.43 36.77 134.43 37.91Q134.43 39.05 134.48 40.41Q134.52 41.78 134.71 44.38L133.66 44.38Q133.43 42.74 132.70 41.37Q131.97 40 130.74 39.18Q129.51 38.36 127.74 38.36L126.78 38.36L126.78 50.02Q126.78 51.34 126.99 52Q127.19 52.66 127.85 52.87Q128.51 53.07 129.74 53.07L131.61 53.07Q133.38 53.07 135 52.14Q136.62 51.21 137.89 48.95Q139.17 46.70 139.81 42.83L140.85 42.83Q140.72 44.38 140.72 46.83Q140.72 47.93 140.76 49.93Q140.81 51.93 141.03 54.12Q138.71 54.03 135.80 54.01Q132.88 53.98 130.61 53.98L127.60 53.98Q125.78 53.98 123.64 54.01Q121.50 54.03 119.31 54.05Q117.13 54.07 115.22 54.12L115.22 53.21Q116.63 53.12 117.33 52.84Q118.04 52.57 118.29 51.75Q118.54 50.93 118.54 49.29L118.54 26.71Q118.54 25.02 118.29 24.23Q118.04 23.43 117.33 23.13Q116.63 22.84 115.22 22.79L115.22 21.88Q117.17 21.93 119.34 21.95Q121.50 21.97 123.62 21.99Q125.73 22.02 127.60 22.02L130.61 22.02Q132.70 22.02 135.37 21.99Q138.03 21.97 140.12 21.88M159.07 21.88Q168.36 21.88 172.84 25.96Q177.33 30.03 177.33 37.64Q177.33 42.60 175.12 46.31Q172.91 50.02 168.72 52.07Q164.53 54.12 158.66 54.12Q157.93 54.12 156.74 54.07Q155.56 54.03 154.26 54.01Q152.97 53.98 151.92 53.98Q149.78 53.98 147.73 54.01Q145.68 54.03 144.45 54.12L144.45 53.21Q145.86 53.12 146.57 52.84Q147.27 52.57 147.52 51.75Q147.77 50.93 147.77 49.29L147.77 26.71Q147.77 25.02 147.52 24.23Q147.27 23.43 146.57 23.13Q145.86 22.84 144.45 22.79L144.45 21.88Q145.68 21.93 147.73 21.99Q149.78 22.06 151.83 22.02Q153.47 21.97 155.56 21.93Q157.66 21.88 159.07 21.88M159.39 22.70Q157.29 22.70 156.65 23.47Q156.02 24.25 156.02 26.62L156.02 49.38Q156.02 51.75 156.68 52.53Q157.34 53.30 159.43 53.30Q162.89 53.30 164.94 51.50Q166.99 49.70 167.88 46.24Q168.77 42.78 168.77 37.82Q168.77 32.72 167.81 29.37Q166.85 26.02 164.78 24.36Q162.71 22.70 159.39 22.70"/><path fill="#0b0b0c" d="M193.33 9.58L193.33 8Q195.15 8.08 198.03 8.16Q200.92 8.24 203.77 8.24Q207.56 8.24 211.01 8.16Q214.45 8.08 215.87 8.08Q222.59 8.08 227.06 9.82Q231.53 11.56 233.71 14.68Q235.88 17.81 235.88 21.84Q235.88 24.29 234.89 27.02Q233.90 29.75 231.45 32.08Q229 34.42 224.81 35.92Q222.59 36.71 219.75 37.11Q220.06 37.11 220.38 37.19Q226.31 37.98 229.04 40.35Q231.77 42.72 232.80 47.63L234.77 55.69Q235.49 59.10 236.32 60.52Q237.15 61.94 238.81 61.94Q240.07 61.86 240.90 61.19Q241.73 60.52 242.68 59.33L243.79 60.20Q241.97 62.66 239.99 63.88Q238.02 65.11 234.69 65.11Q231.29 65.11 228.88 63.33Q226.47 61.55 225.44 56.56L223.86 48.66Q223.15 45.25 222.28 42.76Q221.41 40.27 219.86 38.85Q218.32 37.42 215.40 37.42L208.67 37.42L208.67 55.62Q208.67 58.46 209.15 59.89Q209.62 61.31 210.97 61.79Q212.31 62.26 214.92 62.42L214.92 64Q213.02 63.84 210.14 63.80Q207.25 63.76 204.24 63.76Q200.92 63.76 198.03 63.80Q195.15 63.84 193.33 64L193.33 62.42Q196.02 62.26 197.36 61.79Q198.71 61.31 199.14 59.89Q199.58 58.46 199.58 55.62L199.58 16.38Q199.58 13.46 199.14 12.07Q198.71 10.69 197.32 10.18Q195.94 9.66 193.33 9.58M208.67 16.38L208.67 35.84L213.34 35.84Q218.64 35.84 221.45 34.06Q224.25 32.28 225.24 29.32Q226.23 26.35 226.23 22.71Q226.23 16.46 223.54 13.02Q220.85 9.58 214.21 9.58Q210.81 9.58 209.74 10.93Q208.67 12.27 208.67 16.38"/><path fill="#1a1a1c" d="M28.55 80.50L28 80.50L28 72.90L30.73 72.90Q31.68 72.90 32.36 73.20Q33.05 73.51 33.42 74.08Q33.79 74.65 33.79 75.46Q33.79 76.25 33.42 76.83Q33.05 77.41 32.36 77.71Q31.68 78.01 30.73 78.01L28.55 78.01L28.55 80.50M28.55 73.40L28.55 77.51L30.73 77.51Q31.95 77.51 32.59 76.98Q33.22 76.44 33.22 75.46Q33.22 74.47 32.59 73.94Q31.95 73.40 30.73 73.40M52.47 80.50L47.22 80.50L47.22 72.90L52.30 72.90L52.30 73.40L47.78 73.40L47.78 76.40L51.83 76.40L51.83 76.88L47.78 76.88L47.78 80L52.47 80M66.50 80.50L65.95 80.50L65.95 72.90L68.67 72.90Q70.11 72.90 70.92 73.57Q71.74 74.25 71.74 75.46Q71.74 76.25 71.37 76.82Q71 77.39 70.31 77.70Q70.14 77.79 69.95 77.84L71.85 80.50L71.22 80.50L69.41 77.96Q69.06 78.01 68.67 78.01L66.50 78.01L66.50 80.50M66.50 73.40L66.50 77.53L68.67 77.53Q69.90 77.53 70.54 76.98Q71.17 76.44 71.17 75.46Q71.17 74.47 70.54 73.94Q69.90 73.40 68.67 73.40M85.78 80.50L85.23 80.50L85.23 72.90L90.31 72.90L90.31 73.40L85.78 73.40L85.78 76.65L89.83 76.65L89.83 77.15L85.78 77.15M106.76 80.55Q105.92 80.55 105.19 80.27Q104.47 79.98 103.93 79.45Q103.40 78.93 103.10 78.23Q102.81 77.53 102.81 76.70Q102.81 75.87 103.10 75.17Q103.40 74.47 103.93 73.95Q104.47 73.42 105.19 73.13Q105.92 72.85 106.76 72.85Q107.61 72.85 108.33 73.13Q109.05 73.42 109.59 73.94Q110.12 74.46 110.42 75.16Q110.71 75.86 110.71 76.70Q110.71 77.54 110.42 78.24Q110.12 78.94 109.59 79.46Q109.05 79.98 108.33 80.27Q107.61 80.55 106.76 80.55M106.76 80.04Q107.49 80.04 108.11 79.79Q108.73 79.54 109.18 79.09Q109.64 78.63 109.90 78.02Q110.15 77.42 110.15 76.70Q110.15 75.97 109.90 75.37Q109.64 74.77 109.18 74.31Q108.73 73.86 108.11 73.61Q107.49 73.36 106.76 73.36Q106.04 73.36 105.42 73.61Q104.80 73.86 104.34 74.31Q103.87 74.77 103.62 75.37Q103.36 75.97 103.36 76.70Q103.36 77.42 103.62 78.02Q103.87 78.63 104.34 79.09Q104.80 79.54 105.42 79.79Q106.04 80.04 106.76 80.04M124.65 80.50L124.10 80.50L124.10 72.90L126.82 72.90Q128.26 72.90 129.07 73.57Q129.88 74.25 129.88 75.46Q129.88 76.25 129.52 76.82Q129.15 77.39 128.46 77.70Q128.29 77.79 128.10 77.84L130 80.50L129.37 80.50L127.56 77.96Q127.21 78.01 126.82 78.01L124.65 78.01L124.65 80.50M124.65 73.40L124.65 77.53L126.82 77.53Q128.05 77.53 128.68 76.98Q129.32 76.44 129.32 75.46Q129.32 74.47 128.68 73.94Q128.05 73.40 126.82 73.40M143.92 80.50L143.38 80.50L143.38 72.90L143.84 72.90L147.24 78.77L150.64 72.90L151.09 72.90L151.11 80.50L150.56 80.50L150.55 74L147.37 79.49L147.10 79.49L143.92 74.02M164.54 80.50L163.95 80.50L167.44 72.90L168 72.90L171.49 80.50L170.89 80.50L169.92 78.36L165.51 78.36L164.54 80.50M165.73 77.89L169.71 77.89L167.71 73.51M184.88 80.50L184.33 80.50L184.33 72.90L184.80 72.90L189.97 79.50L189.97 72.90L190.52 72.90L190.52 80.50L190.06 80.50L184.88 73.90M207.84 80.55Q207 80.55 206.27 80.27Q205.55 79.98 205.02 79.46Q204.49 78.94 204.20 78.24Q203.90 77.54 203.90 76.70Q203.90 75.86 204.20 75.16Q204.49 74.46 205.03 73.94Q205.56 73.42 206.28 73.13Q207 72.85 207.84 72.85Q208.65 72.85 209.35 73.11Q210.05 73.37 210.55 73.90L210.20 74.26Q209.71 73.78 209.12 73.57Q208.53 73.36 207.87 73.36Q207.14 73.36 206.51 73.61Q205.89 73.86 205.43 74.31Q204.97 74.77 204.71 75.38Q204.46 75.98 204.46 76.70Q204.46 77.42 204.71 78.02Q204.97 78.63 205.43 79.09Q205.89 79.54 206.51 79.79Q207.14 80.04 207.87 80.04Q208.53 80.04 209.12 79.83Q209.71 79.62 210.20 79.13L210.55 79.49Q210.05 80.02 209.35 80.29Q208.65 80.55 207.84 80.55M229 80.50L223.76 80.50L223.76 72.90L228.84 72.90L228.84 73.40L224.31 73.40L224.31 76.40L228.36 76.40L228.36 76.88L224.31 76.88L224.31 80L229 80"/></svg><!--/sign--></a>
   <a class="call" href="tel:+12104043594">(210) 404-3594</a>
 </header>
 
 <main>
 <div class="hero" id="top">
   <canvas id="stage" aria-label="3D view of the Rated R Performance shop with a car on the dyno"></canvas>
+  <div class="shade" aria-hidden="true"></div>
 
   <div class="enter" id="enter">
     <div>
@@ -331,120 +337,348 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
+renderer.toneMappingExposure = 1.0;
 
 var scene = new THREE.Scene();
-scene.background = new THREE.Color(0x030405);
-scene.fog = new THREE.Fog(0x030405, 18, 48);
+var sky = new THREE.Color(0xc3cad2); // overcast daylight outside the roll-up door
+scene.background = sky;
 var camera = new THREE.PerspectiveCamera(50, 1, 0.1, 120);
 
 function canvasTex(w,h,draw){ var c=document.createElement('canvas'); c.width=w; c.height=h; draw(c.getContext('2d'),w,h); var t=new THREE.CanvasTexture(c); t.encoding=THREE.sRGBEncoding; t.anisotropy=4; return t; }
+function rnd(seed){ return function(){ seed=(seed*16807)%2147483647; return (seed-1)/2147483646; }; } // repeatable noise for textures
+function box(w,h,d,mat,x,y,z,parent){ var m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat); m.position.set(x||0,y||0,z||0); (parent||scene).add(m); return m; }
+function cyl(r,h,mat,seg,parent){ var m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,seg||20),mat); (parent||scene).add(m); return m; }
 
-/* corrugated metal */
-var corrTex = canvasTex(256,256,function(g,w,h){
-  for(var x=0;x<w;x++){ var v=Math.sin(x/w*Math.PI*16); var c=Math.round(118+v*34); g.fillStyle='rgb('+c+','+(c+4)+','+(c+10)+')'; g.fillRect(x,0,1,h); }
-  g.globalAlpha=.07; for(var i=0;i<400;i++){ g.fillStyle=Math.random()>.5?'#000':'#fff'; g.fillRect(Math.random()*w,Math.random()*h,2,Math.random()*18); }
+/* ---------- building: pre-engineered metal shop, gable roof ---------- */
+var ROOM = {w:22, d:26, h:4.6, ridge:5.5}; // h = eave height
+var frontZ = ROOM.d/2, backZ = -ROOM.d/2, RX = ROOM.w/2;
+var doorW = 7.6, doorH = 3.8;           // main roll-up door (the walk-in), centered on x=0
+var door2 = {x0:-9.6, x1:-5.6};         // second roll-up door, closed
+function roofY(x){ return ROOM.ridge - (ROOM.ridge-ROOM.h)*Math.abs(x)/RX; }
+
+/* white vinyl-faced insulation: one 1.25 m panel per tile, seam on the left edge, soft wrinkles */
+function insulationDraw(g,w,h,bays){
+  var r=rnd(bays?7:3);
+  g.fillStyle='#ecebe6'; g.fillRect(0,0,w,h);
+  var s=g.createLinearGradient(0,0,bays?0:w,bays?h:0); // billow: shadowed toward the fasteners, bright mid-panel
+  s.addColorStop(0,'rgba(120,118,110,.32)'); s.addColorStop(.18,'rgba(255,255,255,.05)'); s.addColorStop(.5,'rgba(255,255,255,.22)'); s.addColorStop(.82,'rgba(255,255,255,.05)'); s.addColorStop(1,'rgba(120,118,110,.32)');
+  g.fillStyle=s; g.fillRect(0,0,w,h);
+  for(var i=0;i<38;i++){ // wrinkles: long soft streaks, mostly running down the panel
+    var x=r()*w, y=r()*h, len=80+r()*300, ang=(bays?Math.PI/2:0)+(r()-.5)*.22, dark=r()<.55;
+    g.save(); g.translate(x,y); g.rotate(ang+Math.PI/2);
+    var lg=g.createLinearGradient(0,-3,0,3); lg.addColorStop(0,'rgba(0,0,0,0)'); lg.addColorStop(.5,dark?'rgba(90,88,80,'+(.05+r()*.08)+')':'rgba(255,255,255,'+(.12+r()*.2)+')'); lg.addColorStop(1,'rgba(0,0,0,0)');
+    g.fillStyle=lg; g.fillRect(0,-4-r()*4,len,8+r()*10); g.restore();
+  }
+  g.fillStyle='rgba(70,68,62,.5)'; if(bays) g.fillRect(0,0,w,3); else g.fillRect(0,0,3,h); // seam
+  g.fillStyle='rgba(255,255,255,.7)'; if(bays) g.fillRect(0,3,w,2); else g.fillRect(3,0,2,h);
+}
+var insTex = canvasTex(256,512,function(g,w,h){ insulationDraw(g,w,h,false); });
+insTex.wrapS = insTex.wrapT = THREE.RepeatWrapping; insTex.repeat.set(1/1.25, 1/2.3); // ShapeGeometry UVs are meters
+var insMat = new THREE.MeshStandardMaterial({map:insTex, bumpMap:insTex, bumpScale:.006, roughness:.5, metalness:0});
+var ceilTex = canvasTex(512,256,function(g,w,h){ insulationDraw(g,w,h,true); });
+ceilTex.wrapS = ceilTex.wrapT = THREE.RepeatWrapping;
+
+/* corrugated panels, light khaki (right wall + outside of the building): one rib per tile */
+var corrTex = canvasTex(64,64,function(g,w,h){
+  for(var x=0;x<w;x++){ var u=x/w, v=u<.18?1-u/.18*.5:u<.32?.5:u<.5?.5+(u-.32)/.18*.5:1; // flat pan, sloped rib wall, rib crown
+    var c=Math.round(176*(.8+.2*v)); g.fillStyle='rgb('+c+','+Math.round(c*.965)+','+Math.round(c*.855)+')'; g.fillRect(x,0,1,h); }
 });
-corrTex.wrapS = corrTex.wrapT = THREE.RepeatWrapping;
-function wallMat(rx,ry){ var t=corrTex.clone(); t.needsUpdate=true; t.repeat.set(rx,ry); return new THREE.MeshStandardMaterial({map:t, metalness:.55, roughness:.5}); }
+corrTex.wrapS = corrTex.wrapT = THREE.RepeatWrapping; corrTex.repeat.set(1/.3, 1);
+var corrBump = canvasTex(64,4,function(g,w,h){ for(var x=0;x<w;x++){ var u=x/w, v=u<.2?0:u<.32?(u-.2)/.12:u<.5?1:u<.62?1-(u-.5)/.12:0; var c=Math.round(v*255); g.fillStyle='rgb('+c+','+c+','+c+')'; g.fillRect(x,0,1,h);} });
+corrBump.wrapS = corrBump.wrapT = THREE.RepeatWrapping; corrBump.repeat.set(1/.3, 1);
+var corrMat = new THREE.MeshStandardMaterial({map:corrTex, bumpMap:corrBump, bumpScale:.05, metalness:.35, roughness:.42});
+var maroon = new THREE.MeshStandardMaterial({color:0x4a1f1c, roughness:.5, metalness:.35});
 
-/* concrete floor */
-var floorTex = canvasTex(512,512,function(g,w,h){
-  g.fillStyle='#3a3c40'; g.fillRect(0,0,w,h);
-  for(var i=0;i<9000;i++){ var c=50+Math.random()*40|0; g.fillStyle='rgba('+c+','+c+','+(c+3)+','+(Math.random()*.35)+')'; g.fillRect(Math.random()*w,Math.random()*h,2,2); }
-  g.strokeStyle='rgba(0,0,0,.45)'; g.lineWidth=2; g.strokeRect(0,0,w,h);
-  g.fillStyle='rgba(0,0,0,.18)'; for(var k=0;k<6;k++){ g.beginPath(); g.ellipse(Math.random()*w,Math.random()*h,30+Math.random()*60,14+Math.random()*30,Math.random()*3,0,7); g.fill(); }
+function shapeMesh(pts, mat, holes){ var s=new THREE.Shape(pts.map(function(p){ return new THREE.Vector2(p[0],p[1]); }));
+  (holes||[]).forEach(function(hp){ s.holes.push(new THREE.Path(hp.map(function(p){ return new THREE.Vector2(p[0],p[1]); }))); });
+  var m=new THREE.Mesh(new THREE.ShapeGeometry(s), mat); m.receiveShadow=true; scene.add(m); return m; }
+var gable = [[RX,ROOM.h],[0,ROOM.ridge],[-RX,ROOM.h]];
+
+/* epoxy flake floor: light gray, speckled with darker gray, black and white chips, slightly glossy */
+var floorTex = canvasTex(1024,1024,function(g,w,h){
+  var r=rnd(11); g.fillStyle='#8f9297'; g.fillRect(0,0,w,h);
+  var cols=['#5f6368','#4b4f54','#2b2d30','#1a1b1d','#ececea','#c4c7ca','#7a7e83','#a7aaae'];
+  for(var i=0;i<26000;i++){ g.fillStyle=cols[r()*cols.length|0]; var x=r()*w, y=r()*h, s=1+r()*3.2;
+    g.beginPath(); g.moveTo(x,y); g.lineTo(x+s,y+r()*s*.6); g.lineTo(x+s*.4,y+s); g.closePath(); g.fill(); }
 });
-floorTex.wrapS=floorTex.wrapT=THREE.RepeatWrapping; floorTex.repeat.set(6,6);
-
-var ROOM = {w:22, d:26, h:7.5};
-var floor = new THREE.Mesh(new THREE.PlaneGeometry(ROOM.w, ROOM.d), new THREE.MeshStandardMaterial({map:floorTex, roughness:.38, metalness:.15}));
+floorTex.wrapS=floorTex.wrapT=THREE.RepeatWrapping; floorTex.repeat.set(ROOM.w/2.6, ROOM.d/2.6);
+var floor = new THREE.Mesh(new THREE.PlaneGeometry(ROOM.w, ROOM.d), new THREE.MeshStandardMaterial({map:floorTex, roughness:.3, metalness:.05, envMapIntensity:.7}));
 floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; scene.add(floor);
 
-var backWall = new THREE.Mesh(new THREE.PlaneGeometry(ROOM.w, ROOM.h), wallMat(5,1));
-backWall.position.set(0, ROOM.h/2, -ROOM.d/2); scene.add(backWall);
-var lWall = new THREE.Mesh(new THREE.PlaneGeometry(ROOM.d, ROOM.h), wallMat(6,1));
-lWall.rotation.y = Math.PI/2; lWall.position.set(-ROOM.w/2, ROOM.h/2, 0); scene.add(lWall);
-var rWall = lWall.clone(); rWall.rotation.y = -Math.PI/2; rWall.position.x = ROOM.w/2; scene.add(rWall);
-var ceil = new THREE.Mesh(new THREE.PlaneGeometry(ROOM.w, ROOM.d), new THREE.MeshStandardMaterial({color:0x1a1c20, roughness:.9}));
-ceil.rotation.x = Math.PI/2; ceil.position.y = ROOM.h; scene.add(ceil);
+// back wall (gable end, insulated)
+var backWall = shapeMesh([[-RX,0],[RX,0]].concat(gable), insMat); backWall.position.z = backZ;
+// left wall (insulated); shape x runs along world z
+var lWall = shapeMesh([[-frontZ,0],[frontZ,0],[frontZ,ROOM.h],[-frontZ,ROOM.h]], insMat); lWall.rotation.y = Math.PI/2; lWall.position.x = -RX;
+// right wall: exposed corrugated panels, with the steel door opening near the back corner
+var sideDoor = {z0:-11.05, z1:-10.1, h:2.13};
+var rWall = shapeMesh([[backZ,0],[sideDoor.z0,0],[sideDoor.z0,sideDoor.h],[sideDoor.z1,sideDoor.h],[sideDoor.z1,0],[frontZ,0],[frontZ,ROOM.h],[backZ,ROOM.h]], corrMat);
+rWall.rotation.y = -Math.PI/2; rWall.position.x = RX;
+// front wall: insulated inside, corrugated outside, main door opening
+var frontPts = [[-RX,0],[-doorW/2,0],[-doorW/2,doorH],[doorW/2,doorH],[doorW/2,0],[RX,0]].concat(gable);
+var fIn = shapeMesh(frontPts, insMat); fIn.rotation.y = Math.PI; fIn.position.z = frontZ; // mirrored shape: door is symmetric
+var fOut = shapeMesh(frontPts, corrMat); fOut.position.z = frontZ+.04;
+// ceiling: two insulated slopes
+var slope = Math.atan2(ROOM.ridge-ROOM.h, RX), slopeLen = Math.hypot(RX, ROOM.ridge-ROOM.h);
+[-1,1].forEach(function(side){
+  var t=ceilTex.clone(); t.needsUpdate=true; t.repeat.set(slopeLen/1.6, ROOM.d/3.25);
+  var m=new THREE.Mesh(new THREE.PlaneGeometry(slopeLen, ROOM.d), new THREE.MeshStandardMaterial({map:t, bumpMap:t, bumpScale:.015, roughness:.45}));
+  m.rotation.order='ZXY'; m.rotation.z = -side*slope; m.rotation.x = Math.PI/2;
+  m.position.set(side*RX/2, (ROOM.h+ROOM.ridge)/2, 0); scene.add(m);
+});
 
-/* front wall with roll-up door opening */
-var frontZ = ROOM.d/2;
-var doorW = 8, doorH = 5.6;
-var fwMat = wallMat(2,1); fwMat.side = THREE.DoubleSide;
-var fl = new THREE.Mesh(new THREE.PlaneGeometry((ROOM.w-doorW)/2, ROOM.h), fwMat);
-fl.rotation.y = Math.PI; fl.position.set(-(doorW/2 + (ROOM.w-doorW)/4), ROOM.h/2, frontZ); scene.add(fl);
-var fr = fl.clone(); fr.position.x *= -1; scene.add(fr);
-var ft = new THREE.Mesh(new THREE.PlaneGeometry(doorW, ROOM.h-doorH), fwMat);
-ft.rotation.y = Math.PI; ft.position.set(0, doorH + (ROOM.h-doorH)/2, frontZ); scene.add(ft);
-// roll-up door
-var doorTex = canvasTex(64,256,function(g,w,h){ for(var y=0;y<h;y++){ var v=(y%16)<2?60:150+Math.sin(y/16*Math.PI)*20; g.fillStyle='rgb('+v+','+v+','+(v+6)+')'; g.fillRect(0,y,w,1);} });
-doorTex.wrapT = THREE.RepeatWrapping; doorTex.repeat.set(1,3);
-var door = new THREE.Mesh(new THREE.PlaneGeometry(doorW, doorH), new THREE.MeshStandardMaterial({map:doorTex, metalness:.5, roughness:.45, side:THREE.DoubleSide}));
-door.position.set(0, doorH/2, frontZ-0.03); scene.add(door);
-// outside ground + night
-var outside = new THREE.Mesh(new THREE.PlaneGeometry(60,30), new THREE.MeshStandardMaterial({color:0x121316, roughness:.95}));
+/* ---------- structural steel (oxblood) ---------- */
+function ibeam(len, depth, flange, parent){ // runs along local x, centered
+  var g=new THREE.Group();
+  box(len,.012*2,flange,maroon,0,depth/2-.012,0,g); box(len,.024,flange,maroon,0,-depth/2+.012,0,g); box(len,depth,.014,maroon,0,0,0,g);
+  (parent||scene).add(g); return g;
+}
+var bays = [];
+for(var bz=backZ+.12; bz<=frontZ; bz+=3.25) bays.push(Math.min(bz, frontZ-.12));
+bays.forEach(function(z){ [-1,1].forEach(function(side){ // rafters following the roof pitch
+  var r=ibeam(slopeLen,.34,.16); r.rotation.z=-side*slope; r.position.set(side*RX/2,(ROOM.h+ROOM.ridge)/2-.2,z); }); });
+[-1,1].forEach(function(side){ var e=ibeam(ROOM.d,.24,.14); e.rotation.y=Math.PI/2; e.position.set(side*(RX-.1),ROOM.h-.14,0); }); // eave struts
+function column(x,z,ry){ var c=ibeam(ROOM.h,.28,.2); c.rotation.z=Math.PI/2; c.rotation.y=ry||0; c.position.set(x,ROOM.h/2,z); return c; }
+[[-RX+.12,backZ+.12],[RX-.12,backZ+.12],[-RX+.12,frontZ-.12],[RX-.12,frontZ-.12]].forEach(function(p){ column(p[0],p[1],Math.PI/4); });
+column(-6,backZ+.1); column(6,backZ+.1);                 // back wall
+column(-RX+.1,0,Math.PI/2); column(RX-.1,-3.7,Math.PI/2); // mid side walls (right one splits the corrugated wall)
+var GIRT = 2.5;
+function girt(len,x,z,ry){ var b=box(len,.2,.06,maroon,x,GIRT,z); b.rotation.y=ry||0; var base=box(len,.07,.03,maroon,x,.035,z); base.rotation.y=ry||0; }
+girt(ROOM.w,0,backZ+.04); girt(ROOM.d,-RX+.04,0,Math.PI/2);
+[[-RX,door2.x0],[door2.x1,-doorW/2],[doorW/2,RX]].forEach(function(s){ girt(s[1]-s[0],(s[0]+s[1])/2,frontZ-.04); });
+
+/* ---------- LED shop lights: 8 ft strips between the rafters ---------- */
+var ledMat = new THREE.MeshBasicMaterial({color:0xffffff, toneMapped:false});
+var ledHousing = new THREE.MeshStandardMaterial({color:0xdfe2e6, roughness:.4, metalness:.4});
+bays.slice(0,-1).forEach(function(z,i){ [-1,1].forEach(function(side){ [3.2,7.6].forEach(function(ax){ if(ax>7&&i%2) return;
+  var x=side*ax, y=roofY(x)-.08, g=new THREE.Group(); g.position.set(x,y,z+1.625); g.rotation.z=-side*slope; scene.add(g);
+  box(2.44,.05,.16,ledHousing,0,0,0,g); box(2.4,.02,.11,ledMat,0,-.03,0,g); }); }); });
+
+/* ---------- roll-up doors: cream steel, galvanized tracks, pull chains, spiral duct ---------- */
+function rollTexture(){ return canvasTex(64,256,function(g,w,h){ for(var y=0;y<h;y++){ var p=y%21, v=p<2?172:p<4?248:226+Math.sin(p/21*Math.PI)*12; g.fillStyle='rgb('+v+','+Math.round(v*.975)+','+Math.round(v*.91)+')'; g.fillRect(0,y,w,1);} }); }
+var doorTex = rollTexture(); doorTex.wrapT = THREE.RepeatWrapping; doorTex.repeat.set(1,doorH/1.1);
+var door = new THREE.Mesh(new THREE.PlaneGeometry(doorW, doorH), new THREE.MeshStandardMaterial({map:doorTex, metalness:.2, roughness:.5, side:THREE.DoubleSide}));
+door.position.set(0, doorH/2, frontZ-0.06); scene.add(door);
+var d2Tex = rollTexture(); d2Tex.wrapT = THREE.RepeatWrapping; d2Tex.repeat.set(1,doorH/1.1);
+var d2 = new THREE.Mesh(new THREE.PlaneGeometry(door2.x1-door2.x0, doorH), new THREE.MeshStandardMaterial({map:d2Tex, metalness:.2, roughness:.5, side:THREE.DoubleSide}));
+d2.position.set((door2.x0+door2.x1)/2, doorH/2, frontZ-.06); scene.add(d2);
+var d2Out = d2.clone(); d2Out.position.z = frontZ+.07; scene.add(d2Out);
+var galv = new THREE.MeshStandardMaterial({color:0xb9bec4, metalness:.85, roughness:.35});
+var chainMat = new THREE.MeshStandardMaterial({color:0x9aa0a8, metalness:.9, roughness:.3});
+[[-doorW/2,doorW/2],[door2.x0,door2.x1]].forEach(function(d){
+  [d[0],d[1]].forEach(function(x){ box(.1,doorH+.3,.1,galv,x,(doorH+.3)/2,frontZ-.1); });
+  var drum=cyl(.32,d[1]-d[0]+.2,galv,24); drum.rotation.z=Math.PI/2; drum.position.set((d[0]+d[1])/2,doorH+.35,frontZ-.38);
+  var chain=cyl(.012,doorH-.4,chainMat,6); chain.position.set(d[1]-.35,doorH/2+.55,frontZ-.2);
+  var chain2=chain.clone(); chain2.position.x+=.07; scene.add(chain2);
+});
+var ductTex = canvasTex(128,64,function(g,w,h){ g.fillStyle='#c4c9cf'; g.fillRect(0,0,w,h); g.strokeStyle='rgba(70,76,84,.55)'; g.lineWidth=3; for(var x=-h;x<w+h;x+=16){ g.beginPath(); g.moveTo(x,0); g.lineTo(x+h*.6,h); g.stroke(); } g.strokeStyle='rgba(255,255,255,.6)'; g.lineWidth=2; for(x=-h+5;x<w+h;x+=16){ g.beginPath(); g.moveTo(x,0); g.lineTo(x+h*.6,h); g.stroke(); } });
+ductTex.wrapS=ductTex.wrapT=THREE.RepeatWrapping; ductTex.repeat.set(1,ROOM.w/.22);
+var duct = cyl(.2,ROOM.w,new THREE.MeshStandardMaterial({map:ductTex, metalness:.85, roughness:.3}),20); duct.rotation.z=Math.PI/2; duct.position.set(0,ROOM.h-.42,frontZ-.32);
+// outside: daylight apron
+var outside = new THREE.Mesh(new THREE.PlaneGeometry(60,30), new THREE.MeshStandardMaterial({color:0x7c7f84, roughness:.95}));
 outside.rotation.x=-Math.PI/2; outside.position.set(0,-0.01,frontZ+15); scene.add(outside);
 
-/* exterior sign above door */
-var signTex = canvasTex(1024,256,function(g,w,h){
-  g.fillStyle='#000'; g.fillRect(0,0,w,h);
-});
-var logoImg = new Image();
-logoImg.onload = function(){ var c=signTex.image, g=c.getContext('2d'); g.fillStyle='#000'; g.fillRect(0,0,c.width,c.height);
-  var sh=c.height*0.8, sw=sh*logoImg.width/logoImg.height; if(sw>c.width*0.92){ sw=c.width*0.92; sh=sw*logoImg.height/logoImg.width; }
-  g.drawImage(logoImg,(c.width-sw)/2,(c.height-sh)/2,sw,sh); signTex.needsUpdate=true; };
-logoImg.src = 'logo.png';
-var outSign = new THREE.Mesh(new THREE.PlaneGeometry(5,1.25), new THREE.MeshBasicMaterial({map:signTex}));
-outSign.rotation.y = Math.PI; outSign.position.set(0, doorH+0.95, frontZ+0.05);
-outSign.rotation.y = 0; outSign.position.z = frontZ+0.06;
-scene.add(outSign);
-var outLight = new THREE.SpotLight(0xdde4ff, 2.2, 14, .7, .6);
-outLight.position.set(0, doorH+3, frontZ+3); outLight.target = outSign; scene.add(outLight);
+/* ---------- the shop sign: drawn from the same SVG as the header logo ---------- */
+var signSvg = document.querySelector('.mark svg');
+var SIGN_VB = signSvg ? signSvg.viewBox.baseVal : {x:-36,y:-36,width:329,height:164};
+var SIGN_PAD = -SIGN_VB.x, SIGN_FACE = (SIGN_VB.width-2*SIGN_PAD)/SIGN_VB.width; // face width / texture width
+var signTex = canvasTex(2048, Math.round(2048*SIGN_VB.height/SIGN_VB.width), function(){});
+if(signSvg){
+  var signImg = new Image();
+  signImg.onload = function(){ var c=signTex.image; c.getContext('2d').drawImage(signImg,0,0,c.width,c.height); signTex.needsUpdate=true; };
+  signImg.src = 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(signSvg));
+}
+function shopSign(faceW){ // lightbox + face; returns a group facing +z
+  var g=new THREE.Group(), w=faceW/SIGN_FACE, h=w*SIGN_VB.height/SIGN_VB.width, faceH=faceW*(SIGN_VB.height-2*SIGN_PAD)/(SIGN_VB.width-2*SIGN_PAD);
+  box(faceW*.99,faceH*.97,.1,new THREE.MeshStandardMaterial({color:0x0c0c0e, roughness:.6}),0,0,-.05,g);
+  var face=new THREE.Mesh(new THREE.PlaneGeometry(w,h), new THREE.MeshBasicMaterial({map:signTex, transparent:true, toneMapped:false, depthWrite:false}));
+  face.position.z=.005; face.renderOrder=2; g.add(face); scene.add(g); return g;
+}
+var outSign = shopSign(2.5); outSign.position.set(0, doorH+.66, frontZ+.08);
 
-/* backlit interior sign */
-var inSign = new THREE.Mesh(new THREE.PlaneGeometry(6.4,1.6), new THREE.MeshBasicMaterial({map:signTex}));
-inSign.position.set(0, 4.9, -ROOM.d/2+0.12); scene.add(inSign);
-var halo = new THREE.Mesh(new THREE.PlaneGeometry(7.6,2.6), new THREE.MeshBasicMaterial({color:0x3f5bff, transparent:true, opacity:.55}));
-halo.position.set(0,4.9,-ROOM.d/2+0.06); scene.add(halo);
-var signGlow = new THREE.PointLight(0x4a66ff, 3.2, 12, 2); signGlow.position.set(0,4.9,-ROOM.d/2+1); scene.add(signGlow);
-
-/* lighting */
-scene.add(new THREE.HemisphereLight(0x9fb0ff, 0x1a1a1a, .35));
-var tubeMat = new THREE.MeshBasicMaterial({color:0xffffff});
-[-4.5,0,4.5].forEach(function(x){
-  [-6,0,6].forEach(function(z){
-    var tube = new THREE.Mesh(new THREE.BoxGeometry(.18,.08,3.2), tubeMat); tube.position.set(x,ROOM.h-.3,z); scene.add(tube);
-  });
-});
-var key = new THREE.SpotLight(0xffffff, 2.4, 30, .75, .5, 1.2);
-key.position.set(0, ROOM.h-.4, 1); key.target.position.set(0,0,-3);
+/* ---------- lighting: bright LED shop, daylight from the door, blue sign glow ---------- */
+scene.add(new THREE.HemisphereLight(0xf6f8ff, 0x8d9094, .85));
+var key = new THREE.SpotLight(0xffffff, 1.3, 30, .8, .6, 1.2);
+key.position.set(0, ROOM.ridge-.5, -1); key.target.position.set(0,0,-3.6);
 key.castShadow = true; key.shadow.mapSize.set(1024,1024); key.shadow.bias=-0.0005;
 scene.add(key); scene.add(key.target);
-var fill1 = new THREE.PointLight(0xffffff,.9,22,2); fill1.position.set(-5,ROOM.h-.5,4); scene.add(fill1);
-var fill2 = new THREE.PointLight(0xffffff,.9,22,2); fill2.position.set(5,ROOM.h-.5,-6); scene.add(fill2);
+[[-4,-8],[4,-8],[-4,3],[4,3]].forEach(function(p){ var l=new THREE.PointLight(0xf3f6ff,.42,22,1); l.position.set(p[0],roofY(p[0])-.6,p[1]); scene.add(l); });
+var daylight = new THREE.DirectionalLight(0xfff6ea,.35); daylight.position.set(2,6,30); scene.add(daylight);
 
-/* ---------- dyno ---------- */
+/* ---------- right wall: lit sign, tool chest, side door ---------- */
+var SIGN_Z = -6.1;
+var inSign = shopSign(2.5); inSign.rotation.y = -Math.PI/2; inSign.position.set(RX-.13, 3.2, SIGN_Z);
+var haloTex = canvasTex(256,128,function(g,w,h){ g.scale(1,h/w); var r=g.createRadialGradient(w/2,w/2,6,w/2,w/2,w/2); r.addColorStop(0,'rgba(47,77,255,1)'); r.addColorStop(.4,'rgba(38,66,255,.7)'); r.addColorStop(1,'rgba(30,60,255,0)'); g.fillStyle=r; g.fillRect(0,0,w,w); }); // elliptical LED spill
+var halo = new THREE.Mesh(new THREE.PlaneGeometry(4.6,2.5), new THREE.MeshBasicMaterial({map:haloTex, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, opacity:1, toneMapped:false}));
+halo.rotation.y=-Math.PI/2; halo.position.set(RX-.03,3.2,SIGN_Z); scene.add(halo);
+var signGlow = new THREE.PointLight(0x2f4dff, 5, 5, 2); signGlow.position.set(RX-.35,3.2,SIGN_Z); scene.add(signGlow);
+var signGlowBase = 5;
+
+var black = new THREE.MeshStandardMaterial({color:0x0e0f11, metalness:.55, roughness:.32});
+var matte = new THREE.MeshStandardMaterial({color:0x151618, roughness:.7, metalness:.2});
+var chrome = new THREE.MeshStandardMaterial({color:0xe6e9ec, metalness:1, roughness:.15});
+// rolling tool chest (local +z = drawer fronts)
+var chest = new THREE.Group(); chest.position.set(RX-.42,0,SIGN_Z); chest.rotation.y=-Math.PI/2; scene.add(chest);
+box(1.42,.98,.62,black,0,.6,0,chest).castShadow=true;
+box(1.46,.04,.66,matte,0,1.11,0,chest);
+[.2,.36,.5,.62,.74,.86,.98].forEach(function(y,i){ var dw=i===2?.7:1.32, dx=i===2?-.31:0;
+  box(dw,.006,.005,matte,dx,y,.312,chest); box(dw*.82,.018,.03,chrome,dx,y-.03,.33,chest); });
+box(.6,.24,.62,black,-.36,.82,.02,chest); box(.5,.022,.03,chrome,-.36,.76,.35,chest); // side cabinet
+[[-.62,-.24],[.62,-.24],[-.62,.24],[.62,.24]].forEach(function(p){ var w=cyl(.05,.04,matte,12,chest); w.rotation.z=Math.PI/2; w.position.set(p[0],.06,p[1]); });
+// on top: dyno monitor (live graph), laptop, spray can
+var monitor = new THREE.Group(); monitor.position.set(.18,1.13,-.05); chest.add(monitor);
+box(.92,.56,.04,matte,0,.42,0,monitor); box(.06,.14,.05,matte,0,.07,-.02,monitor); box(.3,.015,.2,matte,0,.008,0,monitor);
+var monC = document.createElement('canvas'); monC.width=512; monC.height=320;
+var monG = monC.getContext('2d');
+var monTex = new THREE.CanvasTexture(monC); monTex.encoding=THREE.sRGBEncoding;
+var screen = new THREE.Mesh(new THREE.PlaneGeometry(.86,.5), new THREE.MeshBasicMaterial({map:monTex, toneMapped:false})); screen.position.set(0,.42,.022); monitor.add(screen);
+var lapTex = canvasTex(256,160,function(g,w,h){ g.fillStyle='#eef1f5'; g.fillRect(0,0,w,h); g.fillStyle='#2a5bd7'; g.fillRect(0,0,w,16); g.fillStyle='#9aa3ad'; for(var y=30;y<h-10;y+=14){ g.fillRect(12,y,60+(y*37%120),5); } g.strokeStyle='#e3262f'; g.lineWidth=3; g.beginPath(); g.moveTo(140,140); g.quadraticCurveTo(190,40,246,60); g.stroke(); });
+var laptop = new THREE.Group(); laptop.position.set(-.48,1.13,.02); laptop.rotation.y=.25; chest.add(laptop);
+box(.34,.015,.24,matte,0,.008,0,laptop);
+var lid = new THREE.Group(); lid.position.set(0,.015,-.12); lid.rotation.x=-.28; laptop.add(lid);
+box(.34,.22,.012,matte,0,.11,0,lid);
+var lapScreen = new THREE.Mesh(new THREE.PlaneGeometry(.31,.19), new THREE.MeshBasicMaterial({map:lapTex, toneMapped:false})); lapScreen.position.set(0,.11,.007); lid.add(lapScreen);
+var can = cyl(.032,.2,new THREE.MeshStandardMaterial({color:0xf2f2f2, roughness:.3, metalness:.4}),14,chest); can.position.set(.7,1.23,.12);
+var cap = cyl(.026,.05,new THREE.MeshStandardMaterial({color:0xd8262c, roughness:.4}),12,chest); cap.position.set(.7,1.355,.12);
+// steel door, propped open, with the compressor room behind it
+var doorFrame = new THREE.MeshStandardMaterial({color:0x3a2a24, roughness:.6});
+box(.14,sideDoor.h+.08,.06,doorFrame,RX-.04,(sideDoor.h+.08)/2,sideDoor.z0-.03); box(.14,sideDoor.h+.08,.06,doorFrame,RX-.04,(sideDoor.h+.08)/2,sideDoor.z1+.03);
+box(.14,.06,sideDoor.z1-sideDoor.z0+.12,doorFrame,RX-.04,sideDoor.h+.03,(sideDoor.z0+sideDoor.z1)/2);
+var leafW = sideDoor.z1-sideDoor.z0, hinge = new THREE.Group(); hinge.position.set(RX-.08,0,sideDoor.z0); hinge.rotation.y=-2.75; scene.add(hinge);
+var leaf = box(leafW,sideDoor.h-.02,.045,new THREE.MeshStandardMaterial({color:0x9ea4aa, metalness:.4, roughness:.45}),leafW/2,sideDoor.h/2,0,hinge); leaf.castShadow=true;
+box(.04,.16,.06,matte,leafW-.12,1.02,.05,hinge); box(.12,.18,.02,matte,leafW-.12,1.5,.03,hinge); // lever handle + closer plate
+var backRoom = new THREE.Mesh(new THREE.BoxGeometry(3,2.7,4.2), new THREE.MeshStandardMaterial({color:0xd9d6cc, roughness:.85, side:THREE.BackSide}));
+backRoom.position.set(RX+1.52,1.35,(sideDoor.z0+sideDoor.z1)/2); scene.add(backRoom);
+var tankMat = new THREE.MeshStandardMaterial({color:0xcfc5ac, metalness:.35, roughness:.45});
+var tank = cyl(.32,1.75,tankMat,24); tank.position.set(RX+.85,.95,sideDoor.z0+.25);
+var tankTop = new THREE.Mesh(new THREE.SphereGeometry(.32,20,10,0,Math.PI*2,0,Math.PI/2), tankMat); tankTop.position.set(RX+.85,1.82,sideDoor.z0+.25); scene.add(tankTop);
+box(.5,.32,.4,new THREE.MeshStandardMaterial({color:0xb7322b, roughness:.5}),RX+.85,2.08,sideDoor.z0+.25); // motor/pump on top
+var roomLight = new THREE.PointLight(0xfff4e0,.6,5,2); roomLight.position.set(RX+1.5,2.4,sideDoor.z0); scene.add(roomLight);
+// security camera dome up by the ceiling
+var camDome = new THREE.Group(); camDome.position.set(RX-.12,ROOM.h-.45,-9.3); scene.add(camDome);
+var whiteP = new THREE.MeshStandardMaterial({color:0xf2f2f0, roughness:.35});
+box(.04,.12,.12,whiteP,.02,0,0,camDome); var arm=cyl(.025,.14,whiteP,10,camDome); arm.rotation.z=Math.PI/2; arm.position.x=-.07;
+var dome = new THREE.Mesh(new THREE.SphereGeometry(.07,16,10), whiteP); dome.position.x=-.16; camDome.add(dome);
+var lens = new THREE.Mesh(new THREE.SphereGeometry(.035,12,8), new THREE.MeshStandardMaterial({color:0x111111, metalness:.6, roughness:.1})); lens.position.set(-.21,-.02,0); camDome.add(lens);
+
+/* right wall floor: step stool, teal fan, blue air mover, fire extinguisher, cables */
+var stool = new THREE.Group(); stool.position.set(RX-.42,0,-2.75); stool.rotation.y=-Math.PI/2; scene.add(stool);
+box(.42,.22,.38,matte,0,.11,.1,stool); box(.42,.44,.2,matte,0,.22,-.09,stool);
+var teal = new THREE.MeshStandardMaterial({color:0x1f8a96, roughness:.45, metalness:.2});
+var tealFan = new THREE.Group(); tealFan.position.set(RX-.4,.3,-1.05); tealFan.rotation.y=-Math.PI/2-.35; scene.add(tealFan);
+var tring = new THREE.Mesh(new THREE.TorusGeometry(.24,.05,10,28), teal); tealFan.add(tring);
+var tgrill = new THREE.Mesh(new THREE.CircleGeometry(.24,24), new THREE.MeshStandardMaterial({color:0x1b1c1f, roughness:.6, side:THREE.DoubleSide})); tealFan.add(tgrill);
+[-1,1].forEach(function(s){ var leg=box(.04,.32,.04,teal,s*.2,-.16,0,tealFan); leg.rotation.z=s*.35; });
+var blue = new THREE.MeshStandardMaterial({color:0x2d63d8, roughness:.35, metalness:.15});
+var mover = new THREE.Group(); mover.position.set(RX-.5,0,-.05); mover.rotation.y=-Math.PI/2-.2; scene.add(mover);
+var snail = cyl(.3,.34,blue,28,mover); snail.rotation.x=Math.PI/2; snail.position.y=.32;
+box(.32,.24,.34,blue,.2,.2,0,mover); box(.14,.1,.36,blue,-.18,.08,0,mover);
+var intake = new THREE.Mesh(new THREE.CircleGeometry(.2,24), new THREE.MeshStandardMaterial({color:0x111214, roughness:.7})); intake.position.set(0,.32,.175); mover.add(intake);
+var ext = cyl(.075,.5,new THREE.MeshStandardMaterial({color:0xc4161c, roughness:.3, metalness:.2}),18); ext.position.set(RX-.25,.25,1.1);
+var extTop = cyl(.03,.12,matte,10); extTop.position.set(RX-.25,.56,1.1);
+var hose = new THREE.Mesh(new THREE.TorusGeometry(.09,.012,6,16,Math.PI), matte); hose.position.set(RX-.25,.5,1.02); hose.rotation.y=Math.PI/2; scene.add(hose);
+var cableMat = new THREE.MeshStandardMaterial({color:0x0b0b0c, roughness:.55});
+[[[RX-.45,.6,SIGN_Z+.4],[RX-.7,.02,SIGN_Z+.9],[RX-1.6,.012,-4.2],[RX-1.4,.012,-3],[RX-.75,.012,-2.4],[RX-.5,.12,-1.2]],
+ [[RX-.4,.5,SIGN_Z+.5],[RX-.9,.012,SIGN_Z+1.3],[RX-2.1,.012,-3.4],[RX-1.3,.012,-1.6],[RX-.6,.012,-.5],[RX-.5,.3,-.05]],
+ [[RX-.42,.7,SIGN_Z-.4],[RX-1,.012,SIGN_Z-.6],[RX-1.5,.012,SIGN_Z-.1],[RX-1.15,.012,SIGN_Z+.5],[RX-1.45,.012,SIGN_Z+.95],[RX-1.05,.012,SIGN_Z+1.1]]
+].forEach(function(pts){ var c=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(function(p){ return new THREE.Vector3(p[0],p[1],p[2]); })),64,.011,6), cableMat); scene.add(c); });
+
+/* ---------- left side: pool table, folding chair ---------- */
+var wood = new THREE.MeshStandardMaterial({color:0x2a1610, roughness:.45, metalness:.1});
+var felt = new THREE.MeshStandardMaterial({color:0x101112, roughness:.95});
+var pool = new THREE.Group(); pool.position.set(-7.6,0,-6.8); scene.add(pool);
+box(1.42,.04,2.56,felt,0,.8,0,pool); box(1.62,.18,2.76,wood,0,.7,0,pool);
+[[-.76,0,.1,2.76],[.76,0,.1,2.76],[0,-1.33,1.62,.1],[0,1.33,1.62,.1]].forEach(function(r){ box(r[2],.07,r[3],wood,r[0],.84,r[1],pool); });
+[[-.73,-1.3],[.73,-1.3],[-.75,0],[.75,0],[-.73,1.3],[.73,1.3]].forEach(function(p){ var pk=cyl(.055,.02,new THREE.MeshStandardMaterial({color:0x050505}),12,pool); pk.position.set(p[0],.875,p[1]); });
+var legProfile = [[0,0],[.09,0],[.09,.05],[.06,.08],[.085,.18],[.05,.3],[.04,.4],[.07,.46],[.05,.52],[.06,.6],[0,.6]].map(function(p){ return new THREE.Vector2(p[0],p[1]); });
+var legGeo = new THREE.LatheGeometry(legProfile,16);
+[[-.66,-1.18],[.66,-1.18],[-.66,1.18],[.66,1.18]].forEach(function(p){ var l=new THREE.Mesh(legGeo,wood); l.position.set(p[0],0,p[1]); l.castShadow=true; pool.add(l); });
+var chair = new THREE.Group(); chair.position.set(-3.3,0,10.2); chair.rotation.y=2.6; scene.add(chair);
+box(.44,.03,.42,matte,0,.46,0,chair); box(.42,.3,.03,matte,0,.78,-.21,chair);
+[[-.2,-1],[.2,-1],[-.2,1],[.2,1]].forEach(function(p){ var l=box(.022,.92,.022,matte,p[0],.43,p[1]*.14,chair); l.rotation.x=p[1]*.22; });
+
+/* ---------- dyno bay: 4-post lift over a Dynojet roller unit ---------- */
 var CAR_Z = -3.2;
 var dyno = new THREE.Group(); scene.add(dyno);
 var steel = new THREE.MeshStandardMaterial({color:0x2a2d33, metalness:.8, roughness:.35});
-var tread = canvasTex(128,128,function(g,w,h){ g.fillStyle='#34373d'; g.fillRect(0,0,w,h); g.fillStyle='#50545c'; for(var y=0;y<h;y+=16)for(var x=(y/16%2)*8;x<w;x+=16){ g.save(); g.translate(x,y); g.rotate(.7); g.fillRect(-5,-1.5,10,3); g.restore(); } });
-tread.wrapS=tread.wrapT=THREE.RepeatWrapping; tread.repeat.set(4,8);
-var DECK_TOP = .12, AXLE_Z = CAR_Z-1.5, PIT = .6; // roller pit half-length around the rear axle
-var deckMat = new THREE.MeshStandardMaterial({map:tread, metalness:.7, roughness:.45});
-[[AXLE_Z+PIT, CAR_Z+3.6], [CAR_Z-3.6, AXLE_Z-PIT]].forEach(function(r){
-  var d=new THREE.Mesh(new THREE.BoxGeometry(3.4,DECK_TOP,r[1]-r[0]), deckMat); d.position.set(0,DECK_TOP/2,(r[0]+r[1])/2); d.receiveShadow=true; dyno.add(d); });
-var pit = new THREE.Mesh(new THREE.PlaneGeometry(3.4,PIT*2), new THREE.MeshStandardMaterial({color:0x08090b, roughness:.9}));
-pit.rotation.x=-Math.PI/2; pit.position.set(0,.004,AXLE_Z); pit.receiveShadow=true; dyno.add(pit);
-var ramp = new THREE.Mesh(new THREE.BoxGeometry(3.4,.06,1.2), steel); ramp.position.set(0,.03,CAR_Z+4.1); ramp.rotation.x=.08; dyno.add(ramp);
+var liftBlack = new THREE.MeshStandardMaterial({color:0x0f1012, metalness:.45, roughness:.38});
+var DECK_TOP = .2, AXLE_Z = CAR_Z-1.5, PIT = .6; // roller pit half-length around the rear axle
+var TRACK = .81, RUN_W = .62, RUN_FRONT = CAR_Z+3.45, POST_X = 1.85, POST_Z = [RUN_FRONT+.15, AXLE_Z-1.85];
+[-1,1].forEach(function(s){ // runways: front tires sit on these
+  var len=RUN_FRONT-(AXLE_Z+PIT);
+  var r=box(RUN_W,.14,len,liftBlack,s*TRACK,DECK_TOP-.07,(RUN_FRONT+AXLE_Z+PIT)/2,dyno); r.receiveShadow=true; r.castShadow=true;
+  box(.03,.05,len,liftBlack,s*TRACK+s*(RUN_W/2-.015),DECK_TOP+.025,(RUN_FRONT+AXLE_Z+PIT)/2,dyno); // outer lip
+});
+POST_Z.forEach(function(z){ box(POST_X*2,.14,.16,liftBlack,0,.07,z,dyno); });               // crossbars
+[-1,1].forEach(function(s){ box(.1,.1,POST_Z[0]-POST_Z[1],liftBlack,s*(POST_X-.05),.05,(POST_Z[0]+POST_Z[1])/2,dyno); }); // side rails
+POST_Z.forEach(function(z){ [-1,1].forEach(function(s){
+  var p=box(.2,2.65,.2,liftBlack,s*POST_X,1.325,z,dyno); p.castShadow=true;
+  box(.36,.02,.36,steel,s*POST_X,.01,z,dyno);                       // base plate
+  box(.22,.03,.22,liftBlack,s*POST_X,2.665,z,dyno);                  // cap
+  box(.05,2.3,.012,new THREE.MeshStandardMaterial({color:0x2a2c30, metalness:.8, roughness:.3}),s*POST_X,1.3,z+(z>CAR_Z?.106:-.106),dyno); // lock ladder
+}); });
+// hydraulic power unit with warning labels (front right post, as in the shop)
+var hpu = new THREE.Group(); hpu.position.set(POST_X+.2,0,POST_Z[0]); dyno.add(hpu);
+box(.22,.42,.2,liftBlack,0,1.3,0,hpu); box(.16,.2,.16,steel,0,1.62,0,hpu); var motor=cyl(.08,.26,liftBlack,16,hpu); motor.position.set(0,1.85,0);
+[['#f5c400',1.38],['#ffffff',1.22]].forEach(function(l){ var lab=new THREE.Mesh(new THREE.PlaneGeometry(.1,.12), new THREE.MeshStandardMaterial({color:l[0], roughness:.6})); lab.position.set(0,l[1],.101); hpu.add(lab); });
+var redBtn = cyl(.02,.03,new THREE.MeshStandardMaterial({color:0xd8262c}),10,hpu); redBtn.rotation.x=Math.PI/2; redBtn.position.set(.06,1.48,.1);
+// aluminum ribbed approach ramps at the front of each runway
+var rampTex = canvasTex(32,128,function(g,w,h){ for(var y=0;y<h;y++){ var v=y%8<3?150:205; g.fillStyle='rgb('+v+','+(v+3)+','+(v+8)+')'; g.fillRect(0,y,w,1);} });
+rampTex.wrapT = THREE.RepeatWrapping; rampTex.repeat.set(1,14);
+var rampLen = 1.45, rampRise = DECK_TOP;
+[-1,1].forEach(function(s){
+  var rp=box(RUN_W-.02,.03,Math.hypot(rampLen,rampRise),new THREE.MeshStandardMaterial({map:rampTex, metalness:.8, roughness:.35}),s*TRACK,rampRise/2,RUN_FRONT+rampLen/2,dyno);
+  rp.rotation.x = Math.atan2(rampRise,rampLen); rp.receiveShadow=true;
+  box(RUN_W,.02,.12,galv,s*TRACK,DECK_TOP+.005,RUN_FRONT+.04,dyno); // hinge plate
+});
+// Dynojet roller unit at the far end: low black housing, rollers flush with the runways
+var DJ_W = 3.3, DJ_REAR = AXLE_Z-PIT-.9;
+box(DJ_W,DECK_TOP,.08,black,0,DECK_TOP/2,AXLE_Z+PIT+.04,dyno);  // front wall
+box(DJ_W,DECK_TOP+.04,AXLE_Z-PIT-DJ_REAR,black,0,(DECK_TOP+.04)/2,(AXLE_Z-PIT+DJ_REAR)/2,dyno); // rear housing
+[-1,1].forEach(function(s){ box(.1,DECK_TOP,PIT*2,black,s*(DJ_W/2-.05),DECK_TOP/2,AXLE_Z,dyno); });
+var pit = new THREE.Mesh(new THREE.PlaneGeometry(DJ_W-.2,PIT*2), new THREE.MeshStandardMaterial({color:0x08090b, roughness:.9}));
+pit.rotation.x=-Math.PI/2; pit.position.set(0,.02,AXLE_Z); pit.receiveShadow=true; dyno.add(pit);
 var rollerMat = new THREE.MeshStandardMaterial({color:0x9da3ab, metalness:.9, roughness:.25});
 var rollers = [];
-var ROLLER_R = .28, ROLLER_GAP = .28, ROLLER_Y = -.1; // tops sit 6cm above the deck
-function addRoller(z){ var r=new THREE.Mesh(new THREE.CylinderGeometry(ROLLER_R,ROLLER_R,3.1,24), rollerMat); r.rotation.z=Math.PI/2; r.position.set(0,ROLLER_Y,z); dyno.add(r); rollers.push(r);
-  var stripe=new THREE.Mesh(new THREE.BoxGeometry(.06,3.12,.04), new THREE.MeshStandardMaterial({color:0xe3262f})); r.add(stripe); stripe.position.z=ROLLER_R-.01; } // along the roller axis (local y)
-// straps
-var strapMat = new THREE.MeshStandardMaterial({color:0xc2161f, roughness:.8});
+var ROLLER_R = .28, ROLLER_GAP = .28, ROLLER_Y = DECK_TOP+.06-ROLLER_R; // tops sit 6cm above the deck
+function addRoller(z){ var r=new THREE.Mesh(new THREE.CylinderGeometry(ROLLER_R,ROLLER_R,DJ_W-.24,24), rollerMat); r.rotation.z=Math.PI/2; r.position.set(0,ROLLER_Y,z); dyno.add(r); rollers.push(r);
+  var stripe=new THREE.Mesh(new THREE.BoxGeometry(.06,DJ_W-.22,.04), new THREE.MeshStandardMaterial({color:0xe3262f})); r.add(stripe); stripe.position.z=ROLLER_R-.01; } // along the roller axis (local y)
+// straps: ratchet tie-downs resting on the roller housing, plus the two holding the nose
+var strapMat = new THREE.MeshStandardMaterial({color:0x8a2a1f, roughness:.8});
+[[-1.1,.25],[-.55,-.2],[.75,.1],[1.2,-.3]].forEach(function(p,i){
+  var s=box(.05,.012,.7+i%2*.25,strapMat,p[0],DECK_TOP+.047,(AXLE_Z-PIT+DJ_REAR)/2+p[1]*.3,dyno); s.rotation.y=p[1];
+  box(.09,.04,.14,chrome,p[0]+.03,DECK_TOP+.06,(AXLE_Z-PIT+DJ_REAR)/2+p[1]*.3+.2,dyno).rotation.y=p[1];
+});
+
+/* back wall: two square cooling fans in a framed opening, black panel below, DYNOJET banner above */
+var FAN_Y = 1.88, fanBlades = [];
+box(2.76,.08,.18,black,0,FAN_Y+.62,backZ+.09); box(2.76,.08,.18,black,0,FAN_Y-.62,backZ+.09);
+[-1.34,0,1.34].forEach(function(x){ box(.08,1.32,.18,black,x,FAN_Y,backZ+.09); });
+box(2.76,.9,.06,matte,0,FAN_Y-.62-.45,backZ+.05); // panel under the fans
+var grilleMat = new THREE.MeshStandardMaterial({color:0xdfe3e7, metalness:1, roughness:.18});
+var bladeMat = new THREE.MeshStandardMaterial({color:0x3a3d42, metalness:.6, roughness:.4});
+[-.67,.67].forEach(function(x){
+  var f=new THREE.Group(); f.position.set(x,FAN_Y,backZ+.1); scene.add(f);
+  var shroud=new THREE.Mesh(new THREE.CircleGeometry(.56,32), new THREE.MeshStandardMaterial({color:0x1a1b1e, roughness:.8})); shroud.position.z=-.02; f.add(shroud);
+  var bl=new THREE.Group(); bl.position.z=.02; f.add(bl); fanBlades.push(bl);
+  for(var b=0;b<5;b++){ var pv=new THREE.Group(); pv.rotation.z=b/5*Math.PI*2; var blade=box(.2,.46,.012,bladeMat,0,.27,0,pv); blade.rotation.y=.45; bl.add(pv); }
+  cyl(.07,.08,matte,16,bl).rotation.x=Math.PI/2;
+  [.18,.3,.42,.54].forEach(function(r){ var t=new THREE.Mesh(new THREE.TorusGeometry(r,.007,5,40), grilleMat); t.position.z=.07; f.add(t); });
+  for(var k=0;k<8;k++){ var sp=box(.008,1.08,.008,grilleMat,0,0,.07,f); sp.rotation.z=k/8*Math.PI; }
+  var hub=new THREE.Mesh(new THREE.CircleGeometry(.06,16), grilleMat); hub.position.z=.075; f.add(hub);
+});
+var bannerTex = canvasTex(1024,360,function(g,w,h){
+  g.fillStyle='#17181b'; g.fillRect(0,0,w,h);
+  g.font='italic 900 168px "Arial Black", "Helvetica Neue", Arial, sans-serif'; g.textBaseline='middle'; g.lineJoin='round';
+  var dw=g.measureText('DYNO').width, jw=g.measureText('JET').width, x0=(w-dw-jw)/2, y=h*.47;
+  g.lineWidth=9; g.strokeStyle='#f4f4f4'; g.strokeText('DYNO',x0,y); g.fillStyle='#e0262b'; g.fillText('DYNO',x0,y);
+  g.strokeStyle='#e0262b'; g.strokeText('JET',x0+dw,y); g.fillStyle='#f4f4f4'; g.fillText('JET',x0+dw,y);
+  g.font='500 22px Arial, sans-serif'; g.fillStyle='rgba(255,255,255,.55)'; g.textAlign='right'; g.fillText('dynojet.com',w-60,h-34);
+  g.fillStyle='rgba(255,255,255,.7)'; [[16,16],[w-16,16],[16,h-16],[w-16,h-16]].forEach(function(p){ g.beginPath(); g.arc(p[0],p[1],6,0,7); g.fill(); }); // grommets
+});
+var banner = new THREE.Mesh(new THREE.PlaneGeometry(3.1,1.09), new THREE.MeshStandardMaterial({map:bannerTex, roughness:.85}));
+banner.position.set(0,FAN_Y+1.45,backZ+.06); scene.add(banner);
+// flat material colors above are written as sRGB hex (as picked from the photos); the renderer works in linear
+scene.traverse(function(o){ var m=o.material; if(m && !m.map && m.color && !m.userData.linear){ m.color.convertSRGBToLinear(); m.userData.linear=true; } });
 
 /* ---------- the car (generic modern muscle coupe) ---------- */
 var car = new THREE.Group();
@@ -510,42 +744,6 @@ addRoller(AXLE_Z-ROLLER_GAP); addRoller(AXLE_Z+ROLLER_GAP);
 // tie-down straps (front)
 [-.95,.95].forEach(function(x){ var s=new THREE.Mesh(new THREE.BoxGeometry(.05,.03,1.4), strapMat); s.position.set(x,.35,CAR_Z+2.3); s.rotation.x=.42; scene.add(s); });
 
-/* dyno fan in front of car */
-var fan = new THREE.Group(); scene.add(fan);
-var fanRing = new THREE.Mesh(new THREE.TorusGeometry(.75,.08,10,40), new THREE.MeshStandardMaterial({color:0x202226, metalness:.6, roughness:.4}));
-fan.add(fanRing);
-var blades = new THREE.Group(); fan.add(blades);
-for(var b=0;b<5;b++){ var bl=new THREE.Mesh(new THREE.BoxGeometry(.18,.66,.02), new THREE.MeshStandardMaterial({color:0x44484f, metalness:.7})); bl.position.y=.34; var pv=new THREE.Group(); pv.rotation.z=b/5*Math.PI*2; bl.rotation.y=.4; pv.add(bl); blades.add(pv); }
-var fanLeg = new THREE.Mesh(new THREE.BoxGeometry(.1,1,.1), steel); fanLeg.position.y=-1.1; fan.add(fanLeg);
-fan.position.set(1.9,1.1,CAR_Z+3.9); fan.rotation.y=-.5;
-
-/* dyno monitor with live graph */
-var monC = document.createElement('canvas'); monC.width=512; monC.height=320;
-var monG = monC.getContext('2d');
-var monTex = new THREE.CanvasTexture(monC); monTex.encoding=THREE.sRGBEncoding;
-var monitor = new THREE.Group(); scene.add(monitor);
-var screen = new THREE.Mesh(new THREE.PlaneGeometry(1.6,1), new THREE.MeshBasicMaterial({map:monTex}));
-var bezel = new THREE.Mesh(new THREE.BoxGeometry(1.72,1.1,.06), trim); bezel.position.z=-.04;
-monitor.add(bezel); monitor.add(screen);
-var stand = new THREE.Mesh(new THREE.BoxGeometry(.08,1.5,.08), steel); stand.position.y=-1.3; monitor.add(stand);
-var cartB = new THREE.Mesh(new THREE.BoxGeometry(.9,.8,.6), new THREE.MeshStandardMaterial({color:0x121417, metalness:.5, roughness:.5})); cartB.position.set(0,-2.05,0); cartB.castShadow=true; monitor.add(cartB);
-monitor.position.set(-3.1,2.45,CAR_Z+.8); monitor.rotation.y=.62;
-
-/* tool chests */
-function chest(x,z,ry,color){
-  var g=new THREE.Group();
-  var m=new THREE.MeshStandardMaterial({color:color, metalness:.55, roughness:.35});
-  var bx=new THREE.Mesh(new THREE.BoxGeometry(2.2,1.2,.75), m); bx.position.y=.7; bx.castShadow=true; g.add(bx);
-  var top=new THREE.Mesh(new THREE.BoxGeometry(2.1,.7,.65), m); top.position.y=1.65; g.add(top);
-  for(var i=0;i<6;i++){ var h=new THREE.Mesh(new THREE.BoxGeometry(1.9,.02,.02), new THREE.MeshStandardMaterial({color:0xaaaaaa, metalness:1})); h.position.set(0,.3+i*.2+(i>3?.3:0),.39); g.add(h); }
-  g.position.set(x,0,z); g.rotation.y=ry; scene.add(g);
-}
-chest(-ROOM.w/2+.6,-7.5,Math.PI/2,0xb3141c);
-chest(ROOM.w/2-.6,-4,-Math.PI/2,0x14161a);
-// two-post lift on the right
-[-1.8,1.8].forEach(function(dz){ var post=new THREE.Mesh(new THREE.BoxGeometry(.3,4.4,.3), new THREE.MeshStandardMaterial({color:0x1b2a6b, metalness:.5, roughness:.5})); post.position.set(7,2.2,4+dz); post.castShadow=true; scene.add(post); });
-// parts boxes
-[[ -7.5,0,3],[ -7.1,0,4.1],[-7.6,.62,3.4]].forEach(function(p){ var bx=new THREE.Mesh(new THREE.BoxGeometry(.9,.6,.7), new THREE.MeshStandardMaterial({color:0x7a5b3a, roughness:.9})); bx.position.set(p[0],p[1]+.3,p[2]); bx.rotation.y=Math.random(); scene.add(bx); });
 
 /* ---------- exhaust flames ---------- */
 var flameTex = canvasTex(64,64,function(g,w,h){ var gr=g.createRadialGradient(32,32,0,32,32,32); gr.addColorStop(0,'rgba(255,255,255,1)'); gr.addColorStop(.25,'rgba(160,190,255,.95)'); gr.addColorStop(.5,'rgba(255,140,40,.7)'); gr.addColorStop(1,'rgba(255,60,0,0)'); g.fillStyle=gr; g.fillRect(0,0,w,h); });
@@ -567,6 +765,7 @@ function burst(n){
 /* ---------- reflections: capture the shop as an environment map ---------- */
 var pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(scene, 0.03).texture;
+scene.background = sky; // r128's fromScene clears a color background and never puts it back
 
 /* ---------- licensed Corvette model (the procedural car above is the fallback) ----------
    Model: "2019 Chevrolet Corvette ZR1" by Ddiaz Design, CC-BY-4.0, via Sketchfab.
@@ -641,12 +840,12 @@ function fitCarModel(model){
 
   window.__car={car:car, seat:seat, tips:tips, wheels:wheels, camera:camera}; // for debugging from the console
 }
-var EXHAUST = {y:.36, inset:.05, z:[-.26,-.09,.09,.26]};
+var EXHAUST = {y:.36+DECK_TOP-.12, inset:.05, z:[-.26,-.09,.09,.26]};
 loadCarModel();
 
 /* ---------- camera path & look controls ---------- */
 var camStart = new THREE.Vector3(0,1.7,frontZ+11);
-var camEnd = new THREE.Vector3(5.0,1.6,CAR_Z+5.6);
+var camEnd = new THREE.Vector3(-5.0,1.6,CAR_Z+5.6); // front-left of the lift: dyno, fans and the lit sign wall all in frame
 var lookStart = new THREE.Vector3(0,2.2,0);
 var lookEnd = new THREE.Vector3(0,.8,CAR_Z);
 camera.position.copy(camStart); camera.lookAt(lookStart);
@@ -743,6 +942,8 @@ function drawMonitor(){
   for(var y=30;y<h-20;y+=36){ g.beginPath(); g.moveTo(40,y); g.lineTo(w-10,y); g.stroke(); }
   g.fillStyle='#7d95ff'; g.font='700 20px Arial'; g.fillText('DYNO RUN  ·  RATED R', 42, 22);
   g.fillStyle='#eef0f3'; g.font='700 30px Arial'; g.textAlign='right'; g.fillText(Math.round(engine.peakHp)+' WHP', w-14, 24); g.textAlign='left';
+  g.strokeStyle='rgba(227,38,47,.75)'; g.lineWidth=2; g.setLineDash([7,6]); g.beginPath(); // baseline pull, so the screen always shows a curve
+  for(var br=2000;br<=7000;br+=100){ var bx=40+(br/MAXRPM)*(w-50), by=(h-30)-(wheelHp(br)*.86/700)*(h-70); if(br>2000) g.lineTo(bx,by); else g.moveTo(bx,by); } g.stroke(); g.setLineDash([]);
   var tr=engine.trace; if(tr.length>1){
     g.strokeStyle='#5d78ff'; g.lineWidth=3; g.beginPath();
     tr.forEach(function(p,i){ var px=40+(p[0]/MAXRPM)*(w-50), py=(h-30)-(p[1]/700)*(h-70); if(i) g.lineTo(px,py); else g.moveTo(px,py); }); g.stroke();
@@ -777,7 +978,8 @@ function tick(){
   if(walk.running && !walk.done){
     walk.t += dt/walk.dur;
     var doorT = Math.min(1, walk.t*2.2);
-    door.position.y = doorH/2 + ease(doorT)*doorH*.95;
+    var shut = 1-ease(doorT)*.97; // rolls up into the drum: shorter panel, same slat size
+    door.scale.y = shut; door.position.y = doorH*(1-shut/2); doorTex.repeat.y = doorH/1.1*shut;
     if(walk.t>=1){ walk.t=1; walk.done=true; hero.classList.add('inside'); startEngine(); }
   }
   var wt = ease(Math.max(0,(walk.t-.18)/.82));
@@ -828,7 +1030,7 @@ function tick(){
     var wheelSpeed = Math.max(0,engine.rpm-IDLE)/MAXRPM * (engine.throttle?60:40);
     wheels.forEach(function(w){ if(w.rear) w.spin.rotation.z -= wheelSpeed*dt; });
     rollers.forEach(function(r){ r.rotation.x += wheelSpeed*dt*1.3; });
-    blades.rotation.z += (6 + engine.rpm/MAXRPM*30)*dt;
+    fanBlades.forEach(function(b){ b.rotation.z -= (6 + engine.rpm/MAXRPM*30)*dt; });
     tailMat.emissiveIntensity = engine.throttle? 2.6 : 1.6;
     tipMat.emissive.setRGB(Math.min(.5,engine.rpm/MAXRPM*.5)*(engine.throttle?1:.6), .08*engine.rpm/MAXRPM, 0);
     if(now-lastDraw>.08){ drawMonitor(); lastDraw=now; }
@@ -841,7 +1043,7 @@ function tick(){
   flameLight.intensity *= .82;
 
   // sign flicker, subtle
-  signGlow.intensity = 3.2 + (reduce?0:Math.sin(now*3)*.15);
+  signGlow.intensity = signGlowBase + (reduce?0:Math.sin(now*3)*.12);
 
   camera.lookAt(tmpLook);
   renderer.render(scene,camera);
