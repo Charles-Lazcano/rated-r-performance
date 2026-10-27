@@ -25,7 +25,9 @@
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --black:#030405; } }
 :root[data-theme="dark"]{ --black:#030405; }
-html{ scroll-padding-top:env(safe-area-inset-top,0px); scroll-behavior:smooth; }
+/* --bar-h: height of the fixed header, so anchors and step changes land below it */
+html{ --bar-h:calc(env(safe-area-inset-top,0px) + 76px); --sec-pad:clamp(72px,11vw,140px); scroll-padding-top:var(--bar-h); scroll-behavior:smooth; }
+@media (max-width:760px){ html{ --bar-h:calc(env(safe-area-inset-top,0px) + 72px); } }
 *,*::before,*::after{ box-sizing:inherit; }
 body{ margin:0; background:var(--black); color:var(--paper); font-family:var(--body); font-size:17px; line-height:1.55; -webkit-font-smoothing:antialiased; }
 a{ color:inherit; }
@@ -33,8 +35,11 @@ a{ color:inherit; }
 img{ max-width:100%; }
 
 /* ---------- top bar ---------- */
-.bar{ position:fixed; top:0; left:0; right:0; z-index:20; padding:calc(env(safe-area-inset-top,0px) + 14px) clamp(16px,4vw,40px) 14px; display:flex; align-items:center; justify-content:space-between; pointer-events:none; }
+.bar{ position:fixed; top:0; left:0; right:0; z-index:20; padding:calc(env(safe-area-inset-top,0px) + 14px) clamp(16px,4vw,40px) 14px; display:flex; align-items:center; justify-content:space-between; gap:12px; pointer-events:none; transition:background .25s; }
 .bar > *{ pointer-events:auto; }
+/* once past the hero, give the header a backing so page content doesn't show through it */
+.bar.solid{ background:rgba(3,4,5,.9); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+.mark{ flex:none; }
 .mark{ font-family:var(--display); font-weight:900; font-size:26px; letter-spacing:.02em; text-decoration:none; line-height:1; }
 /* the wall sign SVG carries ~12% padding on each side for its LED halo; pull it back to the gutter */
 .mark svg{ display:block; height:68px; width:auto; margin:-13px 0 -13px -12px; }
@@ -76,7 +81,7 @@ img{ max-width:100%; }
 .hero.inside .hint{ opacity:.9; }
 
 /* ---------- sections ---------- */
-section{ padding:clamp(72px,11vw,140px) clamp(16px,4vw,40px); }
+section{ padding:var(--sec-pad) clamp(16px,4vw,40px); }
 .wrap{ max-width:1180px; margin:0 auto; }
 h2{ font-family:var(--display); font-weight:900; font-size:clamp(40px,6.4vw,78px); line-height:.9; margin:0 0 22px; }
 .lede{ color:var(--steel-lt); max-width:58ch; margin:0 0 48px; }
@@ -143,13 +148,151 @@ footer .wrap{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:1
   .call{ font-size:16px; padding:8px 12px; }
 }
 @media (prefers-reduced-motion:reduce){ html{ scroll-behavior:auto; } }
+/* ---------- booking + deposit ---------- */
+.bar .acts{ display:flex; gap:8px; align-items:center; flex:none; }
+.call{ white-space:nowrap; display:inline-flex; align-items:center; gap:8px; }
+.call .ico{ width:18px; height:18px; flex:none; display:none; }
+.call.book{ background:var(--tail); border-color:var(--tail); color:#fff; }
+.call.book:hover{ background:#ff3b44; border-color:#ff3b44; }
+/* small screens: the phone number becomes a tap-to-call icon so logo, call and Book share one row */
+@media (max-width:520px){
+  .bar .acts .call{ min-height:44px; }
+  .call.tel{ width:44px; justify-content:center; padding:0; }
+  .call.tel .num{ display:none; }
+  .call.tel .ico{ display:block; }
+}
+
+/* the booking section's first block sits a little under the header when jumped to via #book */
+#book{ scroll-margin-top:calc(28px - var(--sec-pad)); }
+#book .espanol{ margin:0 0 40px; }
+#book h2{ font-size:clamp(36px,6.4vw,78px); }
+
+.booker{ scroll-margin-top:12px; background:var(--paper); color:#11131a; border-radius:2px; position:relative; overflow:hidden; overflow:clip; }
+.booker::before{ content:""; position:absolute; inset:0; background-image:linear-gradient(rgba(63,91,255,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(63,91,255,.10) 1px,transparent 1px); background-size:44px 44px; pointer-events:none; }
+.booker > *{ position:relative; }
+.bk-head{ border-bottom:2px solid #11131a; }
+.bk-prog{ display:none; }
+.bk-steps{ display:grid; grid-template-columns:repeat(4,1fr); list-style:none; margin:0; padding:0; }
+.bk-steps li{ padding:14px 18px; font-family:var(--display); font-weight:700; font-size:18px; color:#7a7f8a; border-right:1px solid rgba(17,19,26,.18); display:flex; gap:8px; align-items:baseline; }
+.bk-steps li:last-child{ border-right:0; }
+.bk-steps li b{ font-size:28px; font-weight:900; line-height:1; }
+.bk-steps li.on{ color:#11131a; background:rgba(63,91,255,.10); }
+.bk-steps li.on b{ color:var(--trace); }
+.bk-steps li.done{ color:#11131a; }
+.bk-steps li.done b{ color:var(--tail); }
+/* phones: the 4-tab bar collapses to "Step 2 of 4 · Date & time" plus numbered dots */
+@media (max-width:640px){
+  .bk-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; }
+  .bk-prog{ display:block; margin:0; font-family:var(--display); font-weight:700; font-size:18px; line-height:1.15; color:#11131a; min-width:0; }
+  .bk-prog b{ color:var(--trace); font-weight:900; }
+  @media (max-width:420px){ .bk-prog{ font-size:16px; } .bk-prog b{ display:block; } .bk-prog .sep{ display:none; } }
+  .bk-steps{ display:flex; gap:6px; flex:none; }
+  .bk-steps li{ width:30px; height:30px; padding:0; border:1.5px solid rgba(17,19,26,.28); border-radius:50%; justify-content:center; align-items:center; }
+  .bk-steps li:last-child{ border-right:1.5px solid rgba(17,19,26,.28); }
+  .bk-steps li b{ font-size:16px; }
+  .bk-steps li span{ display:none; }
+  .bk-steps li.on{ background:var(--trace); border-color:var(--trace); }
+  .bk-steps li.on b{ color:#fff; }
+  .bk-steps li.done{ border-color:var(--tail); }
+}
+
+.bk-pane{ padding:clamp(20px,3.5vw,36px); }
+.bk-pane[hidden]{ display:none; }
+.bk-pane h3{ font-family:var(--display); font-weight:900; font-size:clamp(28px,3.4vw,38px); line-height:1; margin:0 0 6px; color:#0d1340; }
+.bk-pane .sub{ margin:0 0 22px; color:#454a57; font-size:15.5px; }
+
+.pkgs{ display:grid; grid-template-columns:1fr; gap:14px; }
+@media (min-width:560px){ .pkgs{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (min-width:1024px){ .pkgs{ grid-template-columns:repeat(4,minmax(0,1fr)); } }
+.pkg{ text-align:left; font:inherit; color:inherit; background:#fff; border:1.5px solid rgba(17,19,26,.22); border-radius:3px; padding:18px; cursor:pointer; display:grid; gap:6px; align-content:start; transition:border-color .15s, box-shadow .15s; }
+.pkg:hover{ border-color:var(--trace); }
+.pkg[aria-pressed="true"]{ border-color:var(--trace); box-shadow:0 0 0 3px rgba(63,91,255,.25); background:#f4f6ff; }
+.pkg strong{ font-family:var(--display); font-weight:900; font-size:26px; line-height:1; color:#0d1340; }
+.pkg p{ margin:0; font-size:14.5px; color:#454a57; }
+.pkg .meta{ display:flex; flex-wrap:wrap; gap:6px 14px; font-size:13px; color:#454a57; margin-top:4px; }
+.pkg .dep{ font-family:var(--display); font-weight:700; font-size:19px; color:var(--tail); }
+
+.days{ display:flex; gap:8px; overflow-x:auto; padding-bottom:8px; scrollbar-width:thin; scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; }
+.day{ flex:none; width:74px; scroll-snap-align:start; font:inherit; background:#fff; color:#11131a; border:1.5px solid rgba(17,19,26,.22); border-radius:3px; padding:10px 0; cursor:pointer; text-align:center; line-height:1.1; }
+.day small{ display:block; font-size:12px; letter-spacing:.08em; color:#6b707b; text-transform:uppercase; }
+.day b{ display:block; font-family:var(--display); font-size:30px; font-weight:900; }
+.day:disabled{ opacity:.35; cursor:not-allowed; background:transparent; }
+.day[aria-pressed="true"]{ background:#11131a; color:#fff; border-color:#11131a; }
+.day[aria-pressed="true"] small{ color:var(--steel-lt); }
+.slots{ display:grid; grid-template-columns:repeat(auto-fill,minmax(118px,1fr)); gap:10px; margin-top:20px; }
+@media (max-width:640px){ .slots{ grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; } .day{ width:66px; } }
+@media (max-width:380px){ .slots{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+.slot{ font:700 19px var(--display); background:#fff; color:#11131a; border:1.5px solid rgba(17,19,26,.22); border-radius:3px; padding:10px 6px; min-height:48px; cursor:pointer; }
+.slot:hover:not(:disabled){ border-color:var(--trace); }
+.slot:disabled{ cursor:not-allowed; color:#9a9ea7; text-decoration:line-through; background:transparent; }
+.slot[aria-pressed="true"]{ background:var(--trace); border-color:var(--trace); color:#fff; }
+.slotnote{ margin:14px 0 0; font-size:14px; color:#454a57; }
+
+.booker form{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 18px; }
+.booker form .full{ grid-column:1 / -1; }
+.booker .ymm{ display:grid; grid-template-columns:minmax(76px,.34fr) minmax(0,1fr); gap:10px; }
+.booker label{ color:#2b2f3a; }
+/* 16px keeps iOS from zooming the page when a field is focused */
+.booker input,.booker select,.booker textarea{ color:#11131a; background:#fff; border:1.5px solid rgba(17,19,26,.22); font-size:16px; min-height:48px; }
+.booker textarea{ min-height:96px; }
+.booker .check input{ min-height:0; }
+.booker input:focus,.booker select:focus,.booker textarea:focus{ outline:none; border-color:var(--trace); box-shadow:0 0 0 3px rgba(63,91,255,.2); }
+.booker .check{ display:flex; gap:10px; align-items:flex-start; font-size:14.5px; }
+.booker .check input{ width:20px; height:20px; flex:none; margin-top:2px; accent-color:var(--trace); }
+@media (max-width:640px){ .booker form{ grid-template-columns:1fr; } }
+
+.bk-nav{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:26px; padding-top:20px; border-top:1px solid rgba(17,19,26,.18); flex-wrap:wrap; }
+.bk-nav .btn{ cursor:pointer; }
+.bk-nav .btn:disabled{ opacity:.4; cursor:not-allowed; filter:none; }
+.btn.back{ background:none; color:#11131a; border-color:rgba(17,19,26,.35); }
+.btn.pay{ background:var(--tail); border-color:var(--tail); }
+.bk-nav .sum{ font-size:14px; color:#454a57; }
+.bk-nav .sum b{ font-family:var(--display); font-size:20px; color:#11131a; }
+/* phones: Back / Continue ride along the bottom of the screen while the widget is in view */
+@media (max-width:640px){
+  .bk-nav{ position:sticky; bottom:0; z-index:3; flex-wrap:wrap; gap:8px 10px; margin:22px calc(-1 * clamp(20px,3.5vw,36px)) calc(-1 * clamp(20px,3.5vw,36px)); padding:12px clamp(20px,3.5vw,36px) calc(12px + env(safe-area-inset-bottom,0px)); background:var(--paper); box-shadow:0 -8px 20px rgba(17,19,26,.08); }
+  .bk-nav .btn{ flex:1 1 0; min-height:48px; text-align:center; justify-content:center; display:inline-flex; align-items:center; padding:10px 14px; }
+  .bk-nav .btn.back{ flex:0 0 auto; }
+  [data-pane="5"] .bk-nav{ position:static; }
+  [data-pane="5"] .bk-nav .btn{ flex:1 1 100%; }
+  .bk-nav .sum{ flex:1 1 100%; font-size:13.5px; }
+  .bk-nav .sum b{ font-size:17px; }
+}
+
+.receipt{ display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); border:1.5px solid #11131a; background:#fff; }
+.receipt > div{ padding:22px 24px; }
+.receipt > div + div{ border-left:1.5px dashed #11131a; }
+.receipt .line{ display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-bottom:1px solid rgba(17,19,26,.12); font-size:15px; }
+.receipt .line span{ color:#5a5f6b; }
+.receipt .line b{ text-align:right; }
+.receipt .due{ font-family:var(--display); font-weight:900; font-size:52px; line-height:1; color:var(--tail); margin:6px 0 10px; }
+.receipt .policy{ font-size:13.5px; color:#454a57; margin:0; }
+@media (max-width:700px){ .receipt{ grid-template-columns:1fr; } .receipt > div + div{ border-left:0; border-top:1.5px dashed #11131a; } }
+
+.demo-flag{ display:inline-block; font:700 12px var(--body); letter-spacing:.1em; text-transform:uppercase; background:#11131a; color:#fff; padding:4px 8px; border-radius:2px; margin-bottom:12px; }
+.done-head{ display:flex; align-items:center; gap:16px; margin-bottom:18px; }
+.done-head .stamp{ font-family:var(--display); font-weight:900; font-size:20px; color:var(--tail); border:3px solid var(--tail); padding:6px 12px; transform:rotate(-4deg); letter-spacing:.06em; }
+
+/* mock checkout */
+.ck{ position:fixed; inset:0; z-index:50; background:rgba(3,4,5,.72); display:grid; place-items:center; padding:16px; backdrop-filter:blur(3px); }
+.ck[hidden]{ display:none; }
+.ck-card{ width:100%; max-width:420px; background:#fff; color:#11131a; border-radius:8px; padding:24px; box-shadow:0 30px 80px rgba(0,0,0,.5); font-family:var(--body); }
+.ck-card h4{ margin:0; font-size:15px; color:#5a5f6b; font-weight:500; }
+.ck-card .amt{ font-size:36px; font-weight:700; margin:2px 0 16px; }
+.ck-card label{ color:#2b2f3a; font-size:13px; }
+.ck-card input{ background:#fff; color:#11131a; border:1px solid #d3d6dc; border-radius:6px; }
+.ck-card .two{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.ck-card form{ gap:12px; }
+.ck-card button.paybtn{ font:600 16px var(--body); background:var(--trace); color:#fff; border:0; border-radius:6px; padding:14px; cursor:pointer; }
+.ck-card .x{ float:right; background:none; border:0; font-size:22px; cursor:pointer; color:#5a5f6b; line-height:1; }
+.ck-card .fine{ font-size:12px; color:#7a7f8a; text-align:center; margin:0; }
 </style>
 </head>
 <body>
 
 <header class="bar">
   <a class="mark" href="#top" aria-label="Rated R Performance home"><!--sign--><svg xmlns="http://www.w3.org/2000/svg" viewBox="-36 -36 329 164" role="img" aria-label="Rated R Performance"><title>Rated R Performance</title><defs><filter id="rrHalo" filterUnits="userSpaceOnUse" x="-36" y="-36" width="329" height="164"><feGaussianBlur stdDeviation="11"/><feComponentTransfer><feFuncA type="linear" slope="2.2"/></feComponentTransfer></filter><filter id="rrHaloTight" filterUnits="userSpaceOnUse" x="-36" y="-36" width="329" height="164"><feGaussianBlur stdDeviation="3.5"/></filter></defs><rect x="-6" y="-4" width="269" height="100" rx="6" fill="#2f4dff" filter="url(#rrHalo)"/><rect x="-2" y="-1" width="261" height="94" rx="3" fill="#1e3cff" filter="url(#rrHaloTight)"/><rect width="257" height="92" rx="1.5" fill="#f8f8f4"/><rect x="4.5" y="4.5" width="248" height="83" fill="none" stroke="#0b0b0c" stroke-width="2.2"/><rect x="12" y="12" width="174.33" height="52" fill="#0b0b0c"/><path fill="#f8f8f4" d="M21 22.79L21 21.88Q22.23 21.93 24.28 21.97Q26.33 22.02 28.38 22.02Q30.61 22.02 32.68 21.97Q34.75 21.93 35.62 21.93Q40.08 21.93 42.97 22.84Q45.86 23.75 47.32 25.50Q48.78 27.25 48.78 29.85Q48.78 31.49 48.12 33.06Q47.46 34.63 45.89 35.95Q44.31 37.27 41.58 38.05Q40.08 38.46 38.17 38.64Q42.49 38.96 44.68 40.32Q46.86 41.78 47.46 44.60L48.41 49.34Q48.82 51.07 49.28 51.77Q49.73 52.48 50.55 52.44Q51.05 52.44 51.42 52.23Q51.78 52.03 52.15 51.62L52.78 52.21Q51.46 53.62 49.92 54.19Q48.37 54.76 46.32 54.76Q43.63 54.76 41.92 53.71Q40.22 52.66 39.76 49.84L38.99 45.29Q38.71 43.42 38.28 41.96Q37.85 40.50 37.12 39.66Q36.39 38.82 35.07 38.82L32.57 38.82L32.57 49.29Q32.57 50.93 32.82 51.75Q33.07 52.57 33.77 52.84Q34.48 53.12 35.89 53.21L35.89 54.12Q34.62 54.03 32.63 54.01Q30.65 53.98 28.65 53.98Q26.33 53.98 24.28 54.01Q22.23 54.03 21 54.12L21 53.21Q22.41 53.12 23.12 52.84Q23.82 52.57 24.07 51.75Q24.32 50.93 24.32 49.29L24.32 26.71Q24.32 25.02 24.07 24.23Q23.82 23.43 23.12 23.13Q22.41 22.84 21 22.79M32.57 26.71L32.57 37.91L34.16 37.91Q36.66 37.91 37.96 36.88Q39.26 35.86 39.74 34.15Q40.22 32.44 40.22 30.35Q40.22 26.75 39.08 24.77Q37.94 22.79 35.21 22.79Q33.52 22.79 33.04 23.56Q32.57 24.34 32.57 26.71M69.18 21.83L80.20 50.29Q80.88 51.89 81.63 52.53Q82.38 53.16 82.98 53.21L82.98 54.12Q81.52 54.03 79.49 54.01Q77.47 53.98 75.37 53.98Q73.19 53.98 71.23 54.01Q69.27 54.03 68.08 54.12L68.08 53.21Q70.41 53.12 71.04 52.41Q71.68 51.71 70.77 49.38L68.04 41.92L58.48 41.92L57.47 44.51Q56.43 47.24 56.20 48.93Q55.97 50.61 56.43 51.52Q56.88 52.44 57.86 52.80Q58.84 53.16 60.21 53.21L60.21 54.12Q58.61 54.03 57.27 54.01Q55.93 53.98 54.38 53.98Q53.47 53.98 52.53 54.01Q51.60 54.03 50.92 54.12L50.92 53.21Q51.92 53.03 52.94 51.93Q53.97 50.84 54.97 48.15L65.22 21.83Q66.13 21.93 67.20 21.93Q68.27 21.93 69.18 21.83M58.84 41.01L67.72 41.01L63.39 29.21M112.71 21.88Q112.53 24.38 112.46 26.71Q112.39 29.03 112.39 30.26Q112.39 31.26 112.44 32.13Q112.48 32.99 112.53 33.63L111.48 33.63Q110.57 29.58 109.30 27.23Q108.02 24.89 106.40 23.91Q104.79 22.93 102.92 22.93L102.37 22.93L102.37 48.93Q102.37 50.80 102.76 51.71Q103.15 52.62 104.22 52.91Q105.29 53.21 107.34 53.21L107.34 54.12Q105.83 54.07 103.31 54.03Q100.78 53.98 98.05 53.98Q95.36 53.98 92.99 54.03Q90.63 54.07 89.17 54.12L89.17 53.21Q91.22 53.21 92.31 52.91Q93.40 52.62 93.77 51.71Q94.13 50.80 94.13 48.93L94.13 22.93L93.63 22.93Q91.72 22.93 90.12 23.91Q88.53 24.89 87.26 27.21Q85.98 29.53 85.02 33.63L83.98 33.63Q84.07 32.99 84.09 32.13Q84.11 31.26 84.11 30.26Q84.11 29.03 84.05 26.71Q83.98 24.38 83.80 21.88Q85.94 21.93 88.51 21.97Q91.08 22.02 93.63 22.02L102.97 22.02Q105.52 22.02 108.07 21.97Q110.62 21.93 112.71 21.88M140.12 21.88Q139.94 24.02 139.87 26.02Q139.81 28.03 139.81 29.07Q139.81 29.99 139.85 30.85Q139.90 31.72 139.94 32.26L138.89 32.26Q138.39 28.71 137.28 26.66Q136.16 24.61 134.55 23.77Q132.93 22.93 130.97 22.93L129.74 22.93Q128.51 22.93 127.85 23.13Q127.19 23.34 126.99 23.97Q126.78 24.61 126.78 25.98L126.78 37.45L127.74 37.45Q129.06 37.45 130.06 36.88Q131.06 36.32 131.77 35.40Q132.47 34.49 132.93 33.45Q133.38 32.40 133.52 31.44L134.57 31.44Q134.39 34.04 134.41 35.40Q134.43 36.77 134.43 37.91Q134.43 39.05 134.48 40.41Q134.52 41.78 134.71 44.38L133.66 44.38Q133.43 42.74 132.70 41.37Q131.97 40 130.74 39.18Q129.51 38.36 127.74 38.36L126.78 38.36L126.78 50.02Q126.78 51.34 126.99 52Q127.19 52.66 127.85 52.87Q128.51 53.07 129.74 53.07L131.61 53.07Q133.38 53.07 135 52.14Q136.62 51.21 137.89 48.95Q139.17 46.70 139.81 42.83L140.85 42.83Q140.72 44.38 140.72 46.83Q140.72 47.93 140.76 49.93Q140.81 51.93 141.03 54.12Q138.71 54.03 135.80 54.01Q132.88 53.98 130.61 53.98L127.60 53.98Q125.78 53.98 123.64 54.01Q121.50 54.03 119.31 54.05Q117.13 54.07 115.22 54.12L115.22 53.21Q116.63 53.12 117.33 52.84Q118.04 52.57 118.29 51.75Q118.54 50.93 118.54 49.29L118.54 26.71Q118.54 25.02 118.29 24.23Q118.04 23.43 117.33 23.13Q116.63 22.84 115.22 22.79L115.22 21.88Q117.17 21.93 119.34 21.95Q121.50 21.97 123.62 21.99Q125.73 22.02 127.60 22.02L130.61 22.02Q132.70 22.02 135.37 21.99Q138.03 21.97 140.12 21.88M159.07 21.88Q168.36 21.88 172.84 25.96Q177.33 30.03 177.33 37.64Q177.33 42.60 175.12 46.31Q172.91 50.02 168.72 52.07Q164.53 54.12 158.66 54.12Q157.93 54.12 156.74 54.07Q155.56 54.03 154.26 54.01Q152.97 53.98 151.92 53.98Q149.78 53.98 147.73 54.01Q145.68 54.03 144.45 54.12L144.45 53.21Q145.86 53.12 146.57 52.84Q147.27 52.57 147.52 51.75Q147.77 50.93 147.77 49.29L147.77 26.71Q147.77 25.02 147.52 24.23Q147.27 23.43 146.57 23.13Q145.86 22.84 144.45 22.79L144.45 21.88Q145.68 21.93 147.73 21.99Q149.78 22.06 151.83 22.02Q153.47 21.97 155.56 21.93Q157.66 21.88 159.07 21.88M159.39 22.70Q157.29 22.70 156.65 23.47Q156.02 24.25 156.02 26.62L156.02 49.38Q156.02 51.75 156.68 52.53Q157.34 53.30 159.43 53.30Q162.89 53.30 164.94 51.50Q166.99 49.70 167.88 46.24Q168.77 42.78 168.77 37.82Q168.77 32.72 167.81 29.37Q166.85 26.02 164.78 24.36Q162.71 22.70 159.39 22.70"/><path fill="#0b0b0c" d="M193.33 9.58L193.33 8Q195.15 8.08 198.03 8.16Q200.92 8.24 203.77 8.24Q207.56 8.24 211.01 8.16Q214.45 8.08 215.87 8.08Q222.59 8.08 227.06 9.82Q231.53 11.56 233.71 14.68Q235.88 17.81 235.88 21.84Q235.88 24.29 234.89 27.02Q233.90 29.75 231.45 32.08Q229 34.42 224.81 35.92Q222.59 36.71 219.75 37.11Q220.06 37.11 220.38 37.19Q226.31 37.98 229.04 40.35Q231.77 42.72 232.80 47.63L234.77 55.69Q235.49 59.10 236.32 60.52Q237.15 61.94 238.81 61.94Q240.07 61.86 240.90 61.19Q241.73 60.52 242.68 59.33L243.79 60.20Q241.97 62.66 239.99 63.88Q238.02 65.11 234.69 65.11Q231.29 65.11 228.88 63.33Q226.47 61.55 225.44 56.56L223.86 48.66Q223.15 45.25 222.28 42.76Q221.41 40.27 219.86 38.85Q218.32 37.42 215.40 37.42L208.67 37.42L208.67 55.62Q208.67 58.46 209.15 59.89Q209.62 61.31 210.97 61.79Q212.31 62.26 214.92 62.42L214.92 64Q213.02 63.84 210.14 63.80Q207.25 63.76 204.24 63.76Q200.92 63.76 198.03 63.80Q195.15 63.84 193.33 64L193.33 62.42Q196.02 62.26 197.36 61.79Q198.71 61.31 199.14 59.89Q199.58 58.46 199.58 55.62L199.58 16.38Q199.58 13.46 199.14 12.07Q198.71 10.69 197.32 10.18Q195.94 9.66 193.33 9.58M208.67 16.38L208.67 35.84L213.34 35.84Q218.64 35.84 221.45 34.06Q224.25 32.28 225.24 29.32Q226.23 26.35 226.23 22.71Q226.23 16.46 223.54 13.02Q220.85 9.58 214.21 9.58Q210.81 9.58 209.74 10.93Q208.67 12.27 208.67 16.38"/><path fill="#1a1a1c" d="M28.55 80.50L28 80.50L28 72.90L30.73 72.90Q31.68 72.90 32.36 73.20Q33.05 73.51 33.42 74.08Q33.79 74.65 33.79 75.46Q33.79 76.25 33.42 76.83Q33.05 77.41 32.36 77.71Q31.68 78.01 30.73 78.01L28.55 78.01L28.55 80.50M28.55 73.40L28.55 77.51L30.73 77.51Q31.95 77.51 32.59 76.98Q33.22 76.44 33.22 75.46Q33.22 74.47 32.59 73.94Q31.95 73.40 30.73 73.40M52.47 80.50L47.22 80.50L47.22 72.90L52.30 72.90L52.30 73.40L47.78 73.40L47.78 76.40L51.83 76.40L51.83 76.88L47.78 76.88L47.78 80L52.47 80M66.50 80.50L65.95 80.50L65.95 72.90L68.67 72.90Q70.11 72.90 70.92 73.57Q71.74 74.25 71.74 75.46Q71.74 76.25 71.37 76.82Q71 77.39 70.31 77.70Q70.14 77.79 69.95 77.84L71.85 80.50L71.22 80.50L69.41 77.96Q69.06 78.01 68.67 78.01L66.50 78.01L66.50 80.50M66.50 73.40L66.50 77.53L68.67 77.53Q69.90 77.53 70.54 76.98Q71.17 76.44 71.17 75.46Q71.17 74.47 70.54 73.94Q69.90 73.40 68.67 73.40M85.78 80.50L85.23 80.50L85.23 72.90L90.31 72.90L90.31 73.40L85.78 73.40L85.78 76.65L89.83 76.65L89.83 77.15L85.78 77.15M106.76 80.55Q105.92 80.55 105.19 80.27Q104.47 79.98 103.93 79.45Q103.40 78.93 103.10 78.23Q102.81 77.53 102.81 76.70Q102.81 75.87 103.10 75.17Q103.40 74.47 103.93 73.95Q104.47 73.42 105.19 73.13Q105.92 72.85 106.76 72.85Q107.61 72.85 108.33 73.13Q109.05 73.42 109.59 73.94Q110.12 74.46 110.42 75.16Q110.71 75.86 110.71 76.70Q110.71 77.54 110.42 78.24Q110.12 78.94 109.59 79.46Q109.05 79.98 108.33 80.27Q107.61 80.55 106.76 80.55M106.76 80.04Q107.49 80.04 108.11 79.79Q108.73 79.54 109.18 79.09Q109.64 78.63 109.90 78.02Q110.15 77.42 110.15 76.70Q110.15 75.97 109.90 75.37Q109.64 74.77 109.18 74.31Q108.73 73.86 108.11 73.61Q107.49 73.36 106.76 73.36Q106.04 73.36 105.42 73.61Q104.80 73.86 104.34 74.31Q103.87 74.77 103.62 75.37Q103.36 75.97 103.36 76.70Q103.36 77.42 103.62 78.02Q103.87 78.63 104.34 79.09Q104.80 79.54 105.42 79.79Q106.04 80.04 106.76 80.04M124.65 80.50L124.10 80.50L124.10 72.90L126.82 72.90Q128.26 72.90 129.07 73.57Q129.88 74.25 129.88 75.46Q129.88 76.25 129.52 76.82Q129.15 77.39 128.46 77.70Q128.29 77.79 128.10 77.84L130 80.50L129.37 80.50L127.56 77.96Q127.21 78.01 126.82 78.01L124.65 78.01L124.65 80.50M124.65 73.40L124.65 77.53L126.82 77.53Q128.05 77.53 128.68 76.98Q129.32 76.44 129.32 75.46Q129.32 74.47 128.68 73.94Q128.05 73.40 126.82 73.40M143.92 80.50L143.38 80.50L143.38 72.90L143.84 72.90L147.24 78.77L150.64 72.90L151.09 72.90L151.11 80.50L150.56 80.50L150.55 74L147.37 79.49L147.10 79.49L143.92 74.02M164.54 80.50L163.95 80.50L167.44 72.90L168 72.90L171.49 80.50L170.89 80.50L169.92 78.36L165.51 78.36L164.54 80.50M165.73 77.89L169.71 77.89L167.71 73.51M184.88 80.50L184.33 80.50L184.33 72.90L184.80 72.90L189.97 79.50L189.97 72.90L190.52 72.90L190.52 80.50L190.06 80.50L184.88 73.90M207.84 80.55Q207 80.55 206.27 80.27Q205.55 79.98 205.02 79.46Q204.49 78.94 204.20 78.24Q203.90 77.54 203.90 76.70Q203.90 75.86 204.20 75.16Q204.49 74.46 205.03 73.94Q205.56 73.42 206.28 73.13Q207 72.85 207.84 72.85Q208.65 72.85 209.35 73.11Q210.05 73.37 210.55 73.90L210.20 74.26Q209.71 73.78 209.12 73.57Q208.53 73.36 207.87 73.36Q207.14 73.36 206.51 73.61Q205.89 73.86 205.43 74.31Q204.97 74.77 204.71 75.38Q204.46 75.98 204.46 76.70Q204.46 77.42 204.71 78.02Q204.97 78.63 205.43 79.09Q205.89 79.54 206.51 79.79Q207.14 80.04 207.87 80.04Q208.53 80.04 209.12 79.83Q209.71 79.62 210.20 79.13L210.55 79.49Q210.05 80.02 209.35 80.29Q208.65 80.55 207.84 80.55M229 80.50L223.76 80.50L223.76 72.90L228.84 72.90L228.84 73.40L224.31 73.40L224.31 76.40L228.36 76.40L228.36 76.88L224.31 76.88L224.31 80L229 80"/></svg><!--/sign--></a>
-  <a class="call" href="tel:+12104043594">(210) 404-3594</a>
+  <div class="acts"><a class="call tel" href="tel:+12104043594" aria-label="Call (210) 404-3594"><svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg><span class="num">(210) 404-3594</span></a><a class="call book" href="#book">Book dyno</a></div>
 </header>
 
 <main>
@@ -233,19 +376,100 @@ footer .wrap{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:1
   </div>
 </section>
 
-<section style="background:var(--concrete)">
+<section id="book" style="background:var(--concrete)">
   <div class="wrap">
-    <div class="espanol" style="margin-top:0">
+    <div class="espanol">
       <p><strong>Se habla español.</strong></p>
       <p>Llámenos para una cotización o para agendar su carro en el dyno.</p>
+    </div>
+    <h2>Book dyno time</h2>
+    <p class="lede">Pick your session, grab an open slot and hold it with a deposit. The deposit comes off your final bill.</p>
+
+    <div class="booker" id="booker">
+      <div class="bk-head">
+        <p class="bk-prog" id="bkProg" aria-live="polite"><b>Step 1 of 4</b><span class="sep"> · </span>Session</p>
+        <ol class="bk-steps" aria-label="Booking steps">
+          <li data-s="1" class="on"><b>1</b><span>Session</span></li>
+          <li data-s="2"><b>2</b><span>Date &amp; time</span></li>
+          <li data-s="3"><b>3</b><span>Your car</span></li>
+          <li data-s="4"><b>4</b><span>Deposit</span></li>
+        </ol>
+      </div>
+
+      <!-- step 1 -->
+      <div class="bk-pane" data-pane="1">
+        <h3>What are we doing?</h3>
+        <p class="sub">Every session starts with a baseline pull so you see real numbers before anything changes.</p>
+        <div class="pkgs" id="pkgs"></div>
+        <div class="bk-nav"><span class="sum" id="sum1">Choose a session to continue</span><button class="btn" type="button" data-next disabled>Pick a time</button></div>
+      </div>
+
+      <!-- step 2 -->
+      <div class="bk-pane" data-pane="2" hidden>
+        <h3>Pick a day and time</h3>
+        <p class="sub" id="slotSub">Open slots for the next two weeks.</p>
+        <div class="days" id="days" role="group" aria-label="Days"></div>
+        <div class="slots" id="slots" role="group" aria-label="Times"></div>
+        <p class="slotnote" id="slotNote"></p>
+        <div class="bk-nav"><button class="btn back" type="button" data-back>Back</button><button class="btn" type="button" data-next disabled>Add your car</button></div>
+      </div>
+
+      <!-- step 3 -->
+      <div class="bk-pane" data-pane="3" hidden>
+        <h3>Tell us about the car</h3>
+        <p class="sub">So the right tuner is ready and the dyno is set up before you roll in.</p>
+        <form id="carForm" novalidate>
+          <label>Your name<input name="name" required autocomplete="name"></label>
+          <label>Mobile (we text confirmations)<input name="phone" type="tel" required autocomplete="tel" placeholder="(210) 555-0142"></label>
+          <label class="full">Email (for your receipt)<input name="email" type="email" required autocomplete="email"></label>
+          <div class="ymm"><label>Year<input name="year" required inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="off" placeholder="2019"></label><label>Make &amp; model<input name="car" required autocomplete="off" placeholder="Camaro SS"></label></div>
+          <label>Transmission<select name="trans"><option>Automatic</option><option>Manual</option></select></label>
+          <label>Fuel<select name="fuel"><option>93 pump gas</option><option>E85 / flex</option><option>Race fuel</option></select></label>
+          <label>Power goal<select name="goal"><option>Just a baseline number</option><option>Street / daily driver</option><option>Weekend / track</option><option>Max effort</option></select></label>
+          <label class="full">Current mods<textarea name="mods" placeholder="Cam, headers, intake, injectors, previous tune..."></textarea></label>
+          <label class="check full"><input type="checkbox" name="policy" required><span>I understand the deposit holds my slot, comes off my final bill, and is refundable if I cancel or reschedule at least 48 hours ahead. No-shows forfeit the deposit.</span></label>
+        </form>
+        <div class="bk-nav"><button class="btn back" type="button" data-back>Back</button><button class="btn" type="button" data-next disabled>Review deposit</button></div>
+      </div>
+
+      <!-- step 4 -->
+      <div class="bk-pane" data-pane="4" hidden>
+        <h3>Review and hold your slot</h3>
+        <p class="sub">You pay the deposit now. The rest is due when the car is done.</p>
+        <div class="receipt" id="receipt"></div>
+        <div class="bk-nav"><button class="btn back" type="button" data-back>Back</button><button class="btn pay" type="button" id="payBtn">Pay deposit</button></div>
+      </div>
+
+      <!-- confirmed -->
+      <div class="bk-pane" data-pane="5" hidden>
+        <div class="done-head"><span class="stamp">BOOKED</span><h3 id="doneTitle" style="margin:0">You're on the dyno.</h3></div>
+        <p class="sub" id="doneSub"></p>
+        <div class="receipt" id="doneReceipt"></div>
+        <div class="bk-nav"><button class="btn back" type="button" id="again">Book another car</button><a class="btn" id="icsBtn" href="#" download="rated-r-dyno.ics">Add to calendar</a></div>
+      </div>
     </div>
   </div>
 </section>
 
+<div class="ck" id="ck" hidden role="dialog" aria-modal="true" aria-labelledby="ckTitle">
+  <div class="ck-card">
+    <button class="x" type="button" id="ckClose" aria-label="Close">×</button>
+    <span class="demo-flag">Demo checkout · no card is charged</span>
+    <h4 id="ckTitle">Rated R Performance deposit</h4>
+    <div class="amt" id="ckAmt">$0.00</div>
+    <form id="ckForm">
+      <label>Card number<input inputmode="numeric" value="4242 4242 4242 4242" autocomplete="off"></label>
+      <div class="two"><label>Expiry<input value="12 / 29" autocomplete="off"></label><label>CVC<input value="123" autocomplete="off"></label></div>
+      <button class="paybtn" type="submit" id="ckPay">Pay</button>
+      <p class="fine">In the live site this step is Stripe Checkout.</p>
+    </form>
+  </div>
+</div>
+
 <section id="contact">
   <div class="wrap">
-    <h2>Book dyno time</h2>
-    <p class="lede">Call or text for the fastest answer. Tell us the year, make and model and what you want it to do.</p>
+    <h2>Questions? Talk to the shop</h2>
+    <p class="lede">Not sure what you need yet? Call or text for the fastest answer. Tell us the year, make and model and what you want it to do.</p>
     <div class="ticket">
       <div>
         <div class="row"><small>Phone</small><a href="tel:+12104043594">(210) 404-3594</a></div>
@@ -1160,6 +1384,223 @@ tick();
 
 // autostart without sound if user scrolls past the prompt
 window.addEventListener('scroll', function once(){ if(window.scrollY>80 && !walk.running){ document.getElementById('enter').classList.add('gone'); walk.running=true; } }, {passive:true});
+})();
+</script>
+<script>
+/* ---------- booking + deposit ----------
+   Set DEMO:false and fill in the Stripe Payment Links (one per session) to take real deposits.
+   leadEndpoint receives the booking as JSON before checkout (a GoHighLevel inbound webhook,
+   Formspree, Zapier or a small serverless function) so the shop sees who paid for what slot. */
+(function(){
+var BOOKING = {
+  DEMO: true,
+  leadEndpoint: '',
+  shopPhone: '(210) 404-3594',
+  address: '7350 Eckhert Rd, San Antonio, TX 78238',
+  // 0 = Sunday. Closed days have no hours.
+  hours: { 2:[9,17], 3:[9,17], 4:[9,17], 5:[9,17], 6:[9,14] },
+  daysAhead: 14,
+  packages: [
+    { id:'baseline', name:'Baseline pull', blurb:'Three pulls and a printed sheet. Know your number before you spend a dollar on parts.',
+      price:'$150', deposit:50, mins:60, every:60, stripe:'' },
+    { id:'tune', name:'Custom dyno tune', blurb:'Fueling, timing and drivability dialed in on our chassis dyno. Before and after graph included.',
+      price:'From $650', deposit:150, dropoff:['8:30','10:00'], length:'Drop off, ready same day', stripe:'' },
+    { id:'build', name:'Parts install + tune', blurb:'Cam, exhaust, headers, supercharger or turbo kit installed by the people who tune it.',
+      price:'Quoted per build', deposit:250, dropoff:['8:30'], length:'Drop off, 2 to 5 days', stripe:'' },
+    { id:'diag', name:'Diagnostics', blurb:'Check engine light, misfires, drivability problems. We find it before we fix it.',
+      price:'$125', deposit:25, mins:60, every:60, stripe:'' }
+  ]
+};
+
+var $ = function(s,r){ return (r||document).querySelector(s); };
+var $$ = function(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+var root = $('#booker'), state = { step:1, pkg:null, day:null, time:null, car:null, ref:null };
+var DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var money = function(n){ return '$'+n.toFixed(2); };
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function fmtTime(h,m){ var ap = h>=12?'PM':'AM', hh = h%12||12; return hh+':'+(m<10?'0':'')+m+' '+ap; }
+function fmtDay(d){ return DOW[d.getDay()]+', '+MON[d.getMonth()]+' '+d.getDate(); }
+// stand-in for real availability: a stable pseudo-random "taken" pattern per day+time
+function taken(d,t){ var s = d.toDateString()+t, h = 0; for(var i=0;i<s.length;i++){ h = (h*31 + s.charCodeAt(i))|0; } return Math.abs(h)%10 < 3; }
+
+/* step 1: sessions */
+var pk = $('#pkgs');
+BOOKING.packages.forEach(function(p){
+  var b = document.createElement('button');
+  b.type='button'; b.className='pkg'; b.setAttribute('aria-pressed','false'); b.dataset.id=p.id;
+  b.innerHTML = '<strong>'+esc(p.name)+'</strong><p>'+esc(p.blurb)+'</p>'+
+    '<div class="meta"><span>'+esc(p.price)+'</span><span>'+esc(p.length || (p.mins+' min on the dyno'))+'</span></div>'+
+    '<span class="dep">'+money(p.deposit)+' deposit</span>';
+  b.addEventListener('click', function(){
+    state.pkg = p; state.time = null;
+    $$('.pkg',pk).forEach(function(x){ x.setAttribute('aria-pressed', x===b?'true':'false'); });
+    $('#sum1').innerHTML = '<b>'+esc(p.name)+'</b> · '+money(p.deposit)+' deposit to hold';
+    $('[data-pane="1"] [data-next]').disabled = false;
+  });
+  pk.appendChild(b);
+});
+
+/* step 2: days + slots */
+function buildDays(){
+  var wrap = $('#days'); wrap.innerHTML = '';
+  var d0 = new Date(); d0.setHours(0,0,0,0);
+  var firstOpen = null;
+  for(var i=1;i<=BOOKING.daysAhead;i++){
+    var d = new Date(d0); d.setDate(d0.getDate()+i);
+    var open = !!BOOKING.hours[d.getDay()] && slotsFor(d).some(function(s){ return !s.taken; });
+    var b = document.createElement('button');
+    b.type='button'; b.className='day'; b.disabled=!open; b.setAttribute('aria-pressed','false');
+    b.innerHTML = '<small>'+DOW[d.getDay()]+'</small><b>'+d.getDate()+'</b><small>'+MON[d.getMonth()]+'</small>';
+    b.setAttribute('aria-label', fmtDay(d)+(open?'':' (closed or full)'));
+    (function(d,b){ b.addEventListener('click', function(){ pickDay(d,b); }); })(d,b);
+    wrap.appendChild(b);
+    if(open && !firstOpen) firstOpen = [d,b];
+  }
+  var keep = state.day && $$('.day',wrap).filter(function(x,i){ var d = new Date(d0); d.setDate(d0.getDate()+i+1); return d.getTime()===state.day.getTime() && !x.disabled; })[0];
+  if(keep) pickDay(state.day, keep); else if(firstOpen) pickDay(firstOpen[0], firstOpen[1]);
+  $('#slotSub').textContent = state.pkg.dropoff ? 'Pick your drop-off time. We text you when it\'s ready.' : 'Each slot is '+state.pkg.mins+' minutes on the dyno.';
+}
+function slotsFor(d){
+  var hrs = BOOKING.hours[d.getDay()]; if(!hrs) return [];
+  var p = state.pkg, out = [];
+  if(p.dropoff){ p.dropoff.forEach(function(t){ var hm = t.split(':'); out.push({ h:+hm[0], m:+hm[1] }); }); }
+  else { for(var m = hrs[0]*60; m + p.mins <= hrs[1]*60; m += p.every){ out.push({ h:Math.floor(m/60), m:m%60 }); } }
+  return out.map(function(s){ s.label = fmtTime(s.h,s.m); s.taken = taken(d, p.id+s.label); return s; });
+}
+function pickDay(d,btn){
+  state.day = d;
+  $$('.day').forEach(function(x){ x.setAttribute('aria-pressed', x===btn?'true':'false'); });
+  var wrap = $('#slots'); wrap.innerHTML = '';
+  var list = slotsFor(d), keep = false;
+  list.forEach(function(s){
+    var b = document.createElement('button');
+    b.type='button'; b.className='slot'; b.textContent = s.label; b.disabled = s.taken;
+    b.setAttribute('aria-pressed', 'false');
+    if(s.taken) b.setAttribute('aria-label', s.label+' (booked)');
+    if(state.time && state.time.label===s.label && !s.taken){ b.setAttribute('aria-pressed','true'); keep = true; }
+    b.addEventListener('click', function(){
+      state.time = s;
+      $$('.slot',wrap).forEach(function(x){ x.setAttribute('aria-pressed', x===b?'true':'false'); });
+      $('[data-pane="2"] [data-next]').disabled = false;
+      $('#slotNote').textContent = fmtDay(d)+' at '+s.label+' is yours once the deposit goes through.';
+    });
+    wrap.appendChild(b);
+  });
+  if(!keep){ state.time = null; $('[data-pane="2"] [data-next]').disabled = true; $('#slotNote').textContent = list.filter(function(s){return !s.taken;}).length+' open on '+fmtDay(d)+'.'; }
+  // keep the chosen day visible in the swipeable strip without moving the page vertically
+  var strip = $('#days'), sl = btn.offsetLeft - strip.offsetLeft;
+  if(sl < strip.scrollLeft || sl + btn.offsetWidth > strip.scrollLeft + strip.clientWidth) strip.scrollLeft = sl - 8;
+}
+
+/* step 3: car form */
+function badFields(f){
+  return $$('[required]',f).filter(function(el){ return el.type==='checkbox' ? !el.checked : !el.value.trim() || (el.type==='email' && !/^\S+@\S+\.\S+$/.test(el.value)) || (el.name==='year' && !/^(19|20)\d\d$/.test(el.value.trim())); });
+}
+function readCar(){
+  var f = $('#carForm');
+  var bad = badFields(f);
+  $$('[required]',f).forEach(function(el){ el.style.borderColor = bad.indexOf(el)>-1 ? 'var(--tail)' : ''; });
+  if(bad.length){ bad[0].focus(); return null; }
+  var o = {}; new FormData(f).forEach(function(v,k){ o[k]=v; });
+  o.car = o.year.trim()+' '+o.car.trim(); return o;
+}
+// Continue stays disabled until every required field checks out
+function syncCar(){ $('[data-pane="3"] [data-next]').disabled = badFields($('#carForm')).length > 0; }
+$('#carForm').addEventListener('input', syncCar);
+$('#carForm').addEventListener('change', syncCar);
+
+/* step 4: receipt */
+function receiptHTML(paid){
+  var p = state.pkg, c = state.car;
+  return '<div>'+
+    line('Session', p.name)+line('When', fmtDay(state.day)+' · '+state.time.label+(p.dropoff?' drop-off':''))+
+    line('Car', c.car+' · '+c.trans+' · '+c.fuel)+line('Goal', c.goal)+line('Name', c.name)+line('Mobile', c.phone)+
+    (paid ? line('Confirmation', state.ref) : '')+
+  '</div><div>'+
+    '<small style="color:#5a5f6b">'+(paid?'Deposit paid':'Due today')+'</small>'+
+    '<div class="due">'+money(p.deposit)+'</div>'+
+    line('Session price', p.price)+line('Balance', 'Due at pickup, minus deposit')+
+    '<p class="policy" style="margin-top:12px">Refundable with 48 hours notice. Reschedule by text: '+BOOKING.shopPhone+'.</p>'+
+  '</div>';
+  function line(a,b){ return '<div class="line"><span>'+a+'</span><b>'+esc(b)+'</b></div>'; }
+}
+
+/* navigation */
+function go(n){
+  state.step = n;
+  $$('.bk-pane',root).forEach(function(p){ p.hidden = +p.dataset.pane !== n; });
+  $$('.bk-steps li',root).forEach(function(li){ var s=+li.dataset.s; li.className = s===n?'on':(s<n?'done':''); });
+  $('#bkProg').innerHTML = n<=4 ? '<b>Step '+n+' of 4</b><span class="sep"> · </span>'+$('.bk-steps li[data-s="'+n+'"] span',root).innerHTML : '<b>Booked</b><span class="sep"> · </span>All set';
+  if(n===2) buildDays();
+  if(n===3) syncCar();
+  if(n===4){ $('#receipt').innerHTML = receiptHTML(false); $('#payBtn').textContent = 'Pay '+money(state.pkg.deposit)+' deposit'; }
+  root.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth', block:'start' });
+}
+$$('[data-next]',root).forEach(function(b){ b.addEventListener('click', function(){
+  if(state.step===3){ var c = readCar(); if(!c) return; state.car = c; }
+  go(state.step+1);
+}); });
+$$('[data-back]',root).forEach(function(b){ b.addEventListener('click', function(){ go(state.step-1); }); });
+
+/* pay */
+function payload(){
+  var p = state.pkg, s = state.time, start = new Date(state.day); start.setHours(s.h, s.m);
+  return { ref:state.ref, session:p.name, deposit:p.deposit, start:start.toISOString(), customer:state.car };
+}
+$('#payBtn').addEventListener('click', function(){
+  state.ref = 'RRP-' + Math.random().toString(36).slice(2,7).toUpperCase();
+  var data = payload();
+  if(BOOKING.leadEndpoint){ try{ fetch(BOOKING.leadEndpoint,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data), keepalive:true }); }catch(e){} }
+  if(!BOOKING.DEMO && state.pkg.stripe){
+    location.href = state.pkg.stripe + '?client_reference_id=' + encodeURIComponent(state.ref) + '&prefilled_email=' + encodeURIComponent(state.car.email);
+    return;
+  }
+  $('#ckAmt').textContent = money(state.pkg.deposit);
+  $('#ckPay').textContent = 'Pay '+money(state.pkg.deposit);
+  $('#ck').hidden = false; $('#ckPay').focus();
+});
+function closeCk(){ $('#ck').hidden = true; }
+$('#ckClose').addEventListener('click', closeCk);
+$('#ck').addEventListener('click', function(e){ if(e.target===this) closeCk(); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape' && !$('#ck').hidden) closeCk(); });
+$('#ckForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var b = $('#ckPay'); b.disabled = true; b.textContent = 'Processing…';
+  setTimeout(function(){ b.disabled = false; closeCk(); confirmBooking(); }, 1100);
+});
+
+function confirmBooking(){
+  var p = state.pkg, s = state.time;
+  $('#doneTitle').textContent = p.dropoff ? 'Your drop-off is set.' : 'You\'re on the dyno.';
+  $('#doneSub').innerHTML = 'We texted '+esc(state.car.phone)+' and emailed '+esc(state.car.email)+' your confirmation. Bring the car to '+esc(BOOKING.address)+' on '+fmtDay(state.day)+' at '+s.label+'.';
+  $('#doneReceipt').innerHTML = receiptHTML(true);
+  var start = new Date(state.day); start.setHours(s.h, s.m);
+  var end = new Date(start.getTime() + (p.mins||120)*60000);
+  var stamp = function(d){ return d.toISOString().replace(/[-:]/g,'').replace(/\.\d+/,''); };
+  var ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Rated R Performance//Booking//EN','BEGIN:VEVENT',
+    'UID:'+state.ref+'@ratedrperformance','DTSTAMP:'+stamp(new Date()),'DTSTART:'+stamp(start),'DTEND:'+stamp(end),
+    'SUMMARY:'+p.name+' - Rated R Performance','LOCATION:'+BOOKING.address.replace(/,/g,'\\,'),
+    'DESCRIPTION:Confirmation '+state.ref+'. Deposit '+money(p.deposit)+' paid. Questions? Text '+BOOKING.shopPhone+'.',
+    'END:VEVENT','END:VCALENDAR'].join('\r\n');
+  $('#icsBtn').href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
+  go(5);
+}
+$('#again').addEventListener('click', function(){
+  state = { step:1, pkg:null, day:null, time:null, car:null, ref:null };
+  $$('.pkg').forEach(function(x){ x.setAttribute('aria-pressed','false'); });
+  $('#sum1').textContent = 'Choose a session to continue';
+  $('[data-pane="1"] [data-next]').disabled = true;
+  $('#carForm').reset();
+  go(1);
+});
+
+/* header gets a backing once the hero has scrolled out from under it */
+var bar = $('.bar'), heroEl = $('.hero');
+function barBg(){ bar.classList.toggle('solid', heroEl.getBoundingClientRect().bottom <= bar.offsetHeight); }
+window.addEventListener('scroll', barBg, {passive:true}); window.addEventListener('resize', barBg); barBg();
+
+/* returning from live Stripe Checkout: set the Payment Link's success URL to .../#booked */
+if(location.hash === '#booked'){ var s = document.getElementById('book'); if(s) setTimeout(function(){ s.scrollIntoView(); }, 300); }
 })();
 </script>
 </body>
